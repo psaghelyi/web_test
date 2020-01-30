@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+  proxy:
+    build:
+      context: ./proxy_nginx
+    depends_on: 
+      - web
+    ports:
+      - "8080:8080"
+  web:
+    build:
+      context: ./web_bottle
+      #context: ./web_tornado
+      #context: ./web_flask
+      #context: ./web_cherrypy
+      #context: ./web_django
+      #context: ./web_fastAPI
+      #context: ./web_golang
+    depends_on: 
+      - echo
+    expose:
+      - 8080
+  echo:
+    build:
+      context: ./web_golang
+    command: ["app", "-listen", "0.0.0.0:8080", "-wait", "100"]
+    expose:
+      - 8080
+    ports:
+      - "8888:8080"
