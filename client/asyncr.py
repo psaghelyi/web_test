@@ -5,10 +5,12 @@ from target import TARGET
 import time
 from collections import defaultdict
 
+MAX_PARALLELISM = 10
 
 async def fetch(url, session):
     async with session.get(url) as response:
-        await response.read()  # echo service status code
+        body = await response.text()
+        body.split(',')
         return response.status  # actual status code
 
 
@@ -20,7 +22,7 @@ async def bound_fetch(sem, url, session):
 
 async def run(iterations, url):
     status_codes = defaultdict(int)
-    ts = time.time()
+    ts = time.perf_counter()
     tasks = []
 
     sem = asyncio.Semaphore(10)
@@ -32,13 +34,11 @@ async def run(iterations, url):
             # pass Semaphore and session to every GET request
             task = asyncio.ensure_future(bound_fetch(sem, url, session))
             tasks.append(task)
-
         statuses = await asyncio.gather(*tasks)
-
-        for status in statuses:
-            status_codes[status] += 1
-        te = time.time()
-        return status_codes, te - ts
+    te = time.perf_counter()
+    for status in statuses:
+        status_codes[status] += 1
+    return status_codes, te - ts
 
 
 def sleep(iterations):

@@ -1,4 +1,4 @@
-FROM python:2
+FROM python:3
 
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
