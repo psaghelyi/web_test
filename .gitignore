@@ -17,3 +17,4 @@ __pycache__
 !.vscode/extensions.json
 *.code-workspace
 
+test_results

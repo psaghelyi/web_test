@@ -10,12 +10,12 @@ def index():
 
 @route('/relay')
 def relay():
-    t0 = time.perf_counter()
+    t0 = time.time()
     response = session.get('http://echo:8080')
-    t1 = time.perf_counter()
-    for i in range(5000000):
+    t1 = time.time()
+    for i in range(1000000):
         pass
-    t2 = time.perf_counter()
+    t2 = time.time()
     return '{:.2f},{:.2f}'.format((t1-t0) * 1000, (t2-t1) * 1000)
 
 @route('/wait/<ms>')

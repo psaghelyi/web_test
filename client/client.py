@@ -4,7 +4,7 @@ import sys
 #from syncr import *
 from asyncr import *
 
-PARALLEL_REQUESTS = 30
+PARALLEL_REQUESTS = 10
 
 PROCESS_COUNT = PARALLEL_REQUESTS // MAX_PARALLELISM
 MODE = 'relay'
