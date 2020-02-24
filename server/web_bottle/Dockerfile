@@ -28,6 +28,8 @@ RUN apt-get update \
 # Switch back to dialog for any ad-hoc use of apt-get
 ENV DEBIAN_FRONTEND=dialog
 
-CMD ["python", "server.py"]
+ENV PROCESS=1
 
+ENTRYPOINT ["/bin/bash", "-c", \
+    "uwsgi --http :8080 --wsgi-file server.py --process $PROCESS --die-on-term --lazy-apps --enable-threads --thunder-lock"]
 

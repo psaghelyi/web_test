@@ -11,11 +11,12 @@ pid3=$!
 
 COUNTER=0
 
-for instance in {4..12}
+for instance in {36..40..2} 45 50 60 80 100
 do
-    docker-compose up -d --scale web=$instance > /dev/null 2>&1
+    echo "PROCESS=$instance" > server.env
+    docker-compose up -d > /dev/null 2>&1
     sleep 2
-    for user in {1..12} 20 50 100
+    for user in {2..40..2} 45 50 60 80 100
     do
         ((COUNTER++))
         CSV="benchmark""_instance$instance""_user$user"

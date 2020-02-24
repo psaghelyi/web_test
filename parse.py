@@ -16,7 +16,7 @@ def get_requests(file_name):
             if first_line:
                 first_line = False
                 continue
-            return row["# requests"]
+            return int(row["# requests"]) - int(row["# failures"])
 
 
 def extract_results(root, result):
@@ -30,20 +30,20 @@ def extract_results(root, result):
 
 
 
-def main():
+def main(folder):
     result = defaultdict(dict)
-    extract_results('./test_results/50_25', result)
+    extract_results(folder, result)
 
-    print(' ',1,2,3,4,5,6,7,8,9,10,11,12,20,50,100)
     for instance, row in sorted(result.items()):
         print(instance, end=',')
         for user, requests in sorted(row.items()):
             print(requests, end=',')
-        print()
+        print()    
+    return 0
     
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main('./test_results/50-0/'))
 
 
