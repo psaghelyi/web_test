@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import request from 'sync-request';
+import request from 'request';
 
 let router = Router();
 
@@ -13,16 +13,26 @@ router.get('/wait/:ms', async (req, res) => {
     await timeout(parseInt(req.params.ms));
     res.status(200).send('OK');
   } catch (e) {
-    res.status(500).send('ERROR');
+    res.sendStatus(500);
   }
 });
 
-router.get('/relay', (req, res) => {
+router.get('/relay', async (req, res) => {
+  const httpRequest = url =>
+    new Promise((resolve, reject) => {
+      request.get(url, (err, response) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(response);
+      });
+    });
+
   try {
-    let result = request('GET', 'http://echo:8080');
+    const result = await httpRequest('http://echo:8080');
     res.status(200).send(result.statusCode);
   } catch (e) {
-    res.status(500).send('ERROR');
+    res.sendStatus(500);
   }
 });
 
