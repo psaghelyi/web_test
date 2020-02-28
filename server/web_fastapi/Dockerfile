@@ -28,6 +28,8 @@ RUN apt-get update \
 # Switch back to dialog for any ad-hoc use of apt-get
 ENV DEBIAN_FRONTEND=dialog
 
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8080"]
+ENV WORKERS=6
 
+# uvicorn mode
+ENTRYPOINT ["/bin/bash", "-c", "uvicorn server:app --host 0.0.0.0 --port 8080 --workers $WORKERS"]
 

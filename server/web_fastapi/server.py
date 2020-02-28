@@ -1,18 +1,9 @@
 from fastapi import FastAPI
 import time
-import requests
 import aiohttp
 import asyncio
 
 app = FastAPI()
-
-session = requests.session()
-
-
-@app.get("/relay")
-async def relay():
-    response = session.get('http://echo:8080')
-    return '{}'.format(response.status_code)
 
 
 @app.get("/")
@@ -22,24 +13,24 @@ async def read_root():
 
 async def fetch(session, url):
     async with session.get(url) as response:
-        return await response.text()
+        return response.status, await response.text()
 
 
-'''
 @app.get("/relay")
 async def relay():
+    t0 = time.time()
     async with aiohttp.ClientSession() as session:
-        html = await fetch(session, 'http://echo:8080')
-        return aiohttp.web.Response(text='{}'.format(response.status_code))
+        status_code, body = await fetch(session, 'http://echo:8080')
+    t1 = time.time()
+    #for i in range(2000000):
+    #    pass
+    t2 = time.time()
+    return '{:.2f},{:.2f}'.format((t1-t0) * 1000, (t2-t1) * 1000)
 
-    
-    response = session.get('http://echo:8080')
-    return '{}'.format(response.status_code)
-'''
 
 @app.get("/wait/{ms}")
 async def read_item(ms: int):
-    time.sleep(ms/1000.)
+    await asyncio.sleep(ms/1000.)
     return ms
 
 

@@ -11,12 +11,12 @@ pid3=$!
 
 COUNTER=0
 
-for instance in {36..40..2} 45 50 60 80 100
+for instance in {5..40..5} 45 50 60 80 100
 do
-    echo "PROCESS=$instance" > server.env
+    echo "WORKERS=$instance" > server.env
     docker-compose up -d > /dev/null 2>&1
     sleep 2
-    for user in {2..40..2} 45 50 60 80 100
+    for user in {5..40..5} 45 50 60 80 100
     do
         ((COUNTER++))
         CSV="benchmark""_instance$instance""_user$user"
@@ -35,8 +35,8 @@ sleep 3
 
 echo $pid1 $pid2 $pid3
 
-kill -INT $pid1
-kill -INT $pid2
-kill -INT $pid3
+kill -9 $pid1
+kill -9 $pid2
+kill -9 $pid3
 
 read -p "Press enter to continue"

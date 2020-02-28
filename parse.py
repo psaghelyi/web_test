@@ -44,6 +44,6 @@ def main(folder):
 
 
 if __name__ == '__main__':
-    sys.exit(main('./test_results/50-0/'))
+    sys.exit(main('./test_results/50-0 uvicorn-fastapi/'))
 
 

@@ -28,8 +28,10 @@ RUN apt-get update \
 # Switch back to dialog for any ad-hoc use of apt-get
 ENV DEBIAN_FRONTEND=dialog
 
-ENV PROCESS=1
+ENV WORKERS=6
 
-ENTRYPOINT ["/bin/bash", "-c", \
-    "uwsgi --http :8080 --wsgi-file server.py --process $PROCESS --die-on-term --lazy-apps --enable-threads --thunder-lock"]
+# uWSGI mode
+ENTRYPOINT ["/bin/bash", "-c", "uwsgi --http :8080 --wsgi-file server.py --process $WORKERS --die-on-term --lazy-apps --enable-threads --thunder-lock"]
 
+# WSGIRefServer mode
+#CMD ["python", "server.py"]
