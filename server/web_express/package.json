@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "cross-env NODE_ENV=dev nodemon -e js index.js --watch .",
-    "start": "cross-env NODE_ENV=prod node index.js",
+    "start": "cross-env NODE_ENV=prod pm2-runtime index.js",
     "lint": "eslint --ext .js --ignore-path .gitignore ."
   },
   "devDependencies": {
@@ -29,6 +29,7 @@
     "cookie-parser": "^1.4.4",
     "express": "^4.17.1",
     "express-winston": "^4.0.3",
+    "pm2": "^4.2.3",
     "sync-request": "^6.1.0",
     "winston": "^3.2.1"
   }
