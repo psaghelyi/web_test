@@ -29,7 +29,7 @@ router.get('/relay', async (req, res) => {
     });
 
   try {
-    const result = await httpRequest('http://index.hu');
+    const result = await httpRequest('http://echo:8080');
     res.status(200).send(result.statusCode);
   } catch (e) {
     res.sendStatus(500);
