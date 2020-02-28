@@ -30,6 +30,7 @@
     "express": "^4.17.1",
     "express-winston": "^4.0.3",
     "pm2": "^4.2.3",
+    "request": "^2.88.2",
     "sync-request": "^6.1.0",
     "winston": "^3.2.1"
   }
