@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echo
+  namespace: web-test
+  labels:
+    app: echo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: echo-app
+  template:
+    metadata:
+      labels:
+        app: echo-app
+    spec:
+      containers:        
+      - name: server-golang
+        image: webtest/server:golang
+        args:
+        - "app"
+        - "-listen=0.0.0.0:8080"
+        - "-wait=50"
+        ports:
+        - containerPort: 8080

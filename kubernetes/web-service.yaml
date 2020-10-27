@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: web-service
+  namespace: web-test
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 8888
+    targetPort: 8080  
+    protocol: TCP
+  selector:
+    app: web-app
