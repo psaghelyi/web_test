@@ -13,11 +13,8 @@ def index():
 def relay():
     t0 = time.time()
     response = session.get('http://echo:8080')
-    t1 = time.time()
-    #for i in range(2000000):
-    #    pass
-    t2 = time.time()
-    return '{:.2f},{:.2f}'.format((t1-t0) * 1000, (t2-t1) * 1000)
+    t = time.time()
+    return '{:.2f}'.format((t-t0) * 1000)
 
 @app.route('/wait/<ms>')
 def wait(ms):

@@ -1,19 +1,30 @@
 version: '3.7'
 
 services:
-#  proxy:
-#    build:
-#      context: ./proxy_nginx
-#    depends_on: 
-#      - web
-#    ports:
-#      - "8000:8080"
+  proxy:
+    image: proxy
+    build:
+      context: proxy_nginx
+    expose:
+      - 8080
+    ports:
+      - "8080:8080"
+
+  echo:
+    image: echo
+    build:
+      context: web_golang
+    expose:
+      - 8080
+    ports:
+      - "8888:8080"
+
   web:
     image: webtest-web
     env_file:
       - ./server.env
     build:
-      context: ./web_bottle
+      context: web_bottle
       #context: ./web_fastAPI
       #context: ./web_falcon
       #context: ./web_tornado
@@ -21,18 +32,6 @@ services:
       #context: ./web_cherrypy
       #context: ./web_django
       #context: ./web_express
-    depends_on: 
-      - echo
     expose:
       - 8080
-    ports:
-      - "8080:8080"
-  echo:
-    image: webtest-go
-    build:
-      context: ./web_golang
-    command: ["app", "-listen", "0.0.0.0:8080", "-wait", "50"]
-    expose:
-      - 8080
-    ports:
-      - "8888:8080"
+  

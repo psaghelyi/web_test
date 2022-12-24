@@ -1,98 +1,78 @@
+
 package main
 
 import (
 	"context"
-	"flag"
-	"fmt"
 	"log"
+	"fmt"
 	"net/http"
-	"os"
 	"os/signal"
+	"syscall"
 	"time"
-)
+	"strconv"
 
-var (
-	listenFlag  = flag.String("listen", ":8080", "address and port to listen")
-	textFlag    = flag.String("text", "Hello from go", "text to put on the webpage")
-	versionFlag = flag.Bool("version", false, "display version information")
-	waitFlag    = flag.Int("wait", 0, "extra pause ms before sending the result")
-	verboseFlag = flag.Bool("verbose", false, "print request instrumentation")
-
-	// stdoutW and stderrW are for overriding in test.
-	stdoutW = os.Stdout
-	stderrW = os.Stderr
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	flag.Parse()
+	// Create context that listens for the interrupt signal from the OS.
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
-	// Asking for the version?
-	if *versionFlag {
-		fmt.Fprintln(stderrW, "1.0.0")
-		os.Exit(0)
-	}
+	// Default With the Logger and Recovery middleware already attached
+	// use gin.New() if you want to skip middlewares
+	router := gin.Default()
 
-	// Validation
-	if *textFlag == "" {
-		fmt.Fprintln(stderrW, "Missing -text option!")
-		os.Exit(127)
-	}
+	router.GET("/", func(c *gin.Context) {
+		c.String(http.StatusOK, "Hello from GoLang - Gin Server")
+	})
 
-	args := flag.Args()
-	if len(args) > 0 {
-		fmt.Fprintln(stderrW, "Too many arguments!")
-		os.Exit(127)
-	}
+	router.GET("/wait", func(c *gin.Context) {
+		param_ms := c.DefaultQuery("ms", "200")
+		wait_ms, _ := strconv.ParseInt(param_ms, 0, 32)
+		time.Sleep(time.Duration(wait_ms) * time.Millisecond)
+		c.String(http.StatusOK, param_ms)
+	})
 
-	mux := http.NewServeMux()
-	if *verboseFlag {
-		mux.HandleFunc("/", httpLog(stdoutW, withAppHeaders(httpEcho(*textFlag, *waitFlag))))
-	} else {
-		mux.HandleFunc("/", withAppHeaders(httpEcho(*textFlag, *waitFlag)))
-	}
-	// Health endpoint
-	mux.HandleFunc("/health", withAppHeaders(httpHealth()))
-
-	server := &http.Server{
-		Addr:    *listenFlag,
-		Handler: mux,
-	}
-	serverCh := make(chan struct{})
-	go func() {
-		log.Printf("[INFO] server is listening on %s\n", *listenFlag)
-		if err := server.ListenAndServe(); err != http.ErrServerClosed {
-			log.Fatalf("[ERR] server exited with: %s", err)
+	router.GET("/relay", func(c *gin.Context) {
+		start := time.Now()
+		_, err := http.Get("http://echo:8080")
+		elapsed := time.Since(start)
+		
+		if err != nil {
+			fmt.Printf("error making http request: %s\n", err)
 		}
-		close(serverCh)
+
+		c.String(http.StatusOK, elapsed.String())
+	})
+
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: router,
+	}
+
+	// Initializing the server in a goroutine so that
+	// it won't block the graceful shutdown handling below
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
 	}()
 
-	signalCh := make(chan os.Signal, 1)
-	signal.Notify(signalCh, os.Interrupt)
+	// Listen for the interrupt signal.
+	<-ctx.Done()
 
-	// Wait for interrupt
-	<-signalCh
+	// Restore default behavior on the interrupt signal and notify user of shutdown.
+	stop()
+	log.Println("shutting down gracefully, press Ctrl+C again to force")
 
-	log.Printf("[INFO] received interrupt, shutting down...")
+	// The context is used to inform the server it has 5 seconds to finish
+	// the request it is currently handling
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-
-	if err := server.Shutdown(ctx); err != nil {
-		log.Fatalf("[ERR] failed to shutdown server: %s", err)
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server forced to shutdown: ", err)
 	}
 
-	// If we got this far, it was an interrupt, so don't exit cleanly
-	os.Exit(2)
-}
-
-func httpEcho(v string, t int) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		time.Sleep(time.Duration(t) * time.Millisecond)
-		fmt.Fprintln(w, v)
-	}
-}
-
-func httpHealth() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `{"status":"ok"}`)
-	}
+	log.Println("Server exiting")
 }

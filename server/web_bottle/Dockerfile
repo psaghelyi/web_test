@@ -13,8 +13,8 @@ COPY requirements.txt /tmp/pip-tmp/
 
 # Configure apt and install packages
 RUN apt-get update \
-    && apt-get -y install --no-install-recommends apt-utils dialog 2>&1 \
-    && apt-get -y install htop atop \
+    && apt-get install -y --no-install-recommends apt-utils dialog 2>&1 \
+    && apt-get install -y htop \
     #
     # Update Python environment based on requirements.txt
     && pip --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
@@ -28,7 +28,7 @@ RUN apt-get update \
 # Switch back to dialog for any ad-hoc use of apt-get
 ENV DEBIAN_FRONTEND=dialog
 
-ENV WORKERS=6
+ENV WORKERS=4
 
 # uWSGI mode
 ENTRYPOINT ["/bin/bash", "-c", "uwsgi --http :8080 --wsgi-file server.py --process $WORKERS --die-on-term --lazy-apps --enable-threads --thunder-lock"]

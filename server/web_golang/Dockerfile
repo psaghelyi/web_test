@@ -1,11 +1,17 @@
-FROM golang:1.8
+FROM golang:1.18
 
-RUN apt-get -y update && apt-get -y install htop atop
+WORKDIR /app
 
-WORKDIR /go/src/app
-COPY . .
+RUN go mod init app
 
-RUN go get -d -v ./...
-RUN go install -v ./...
+ADD . .
 
-CMD ["app"]
+RUN go get
+
+RUN go mod tidy
+
+EXPOSE 8080
+
+ENV GIN_MODE=release
+
+CMD [ "go", "run", "main.go" ]
