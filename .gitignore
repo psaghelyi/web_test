@@ -3,6 +3,7 @@
 *.sqlite*
 
 .idea
+.venv/*
 
 Pipfile
 Pipfile.lock

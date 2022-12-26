@@ -12,7 +12,7 @@ def index():
 @app.route('/relay')
 def relay():
     t0 = time.time()
-    response = session.get('http://echo:8080')
+    response = session.get('http://echo:8080/wait')
     t = time.time()
     return '{:.2f}'.format((t-t0) * 1000)
 

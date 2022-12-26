@@ -1,13 +1,11 @@
-#!/usr/local/bin/bash
+#!/bin/bash
 
 echo "Bash version ${BASH_VERSION}..."
 
-locust -f locustfile.py --slave &
+locust -f locustfile.py --worker &
 pid1=$!
-locust -f locustfile.py --slave &
+locust -f locustfile.py --worker &
 pid2=$!
-locust -f locustfile.py --slave &
-pid3=$!
 
 COUNTER=0
 
@@ -21,7 +19,7 @@ do
         ((COUNTER++))
         CSV="benchmark""_instance$instance""_user$user"
         echo "$COUNTER experience:"
-        locust -f locustfile.py --csv=$CSV --no-web --run-time 2m -c $user -r '-1' --host 'http://127.0.01:8080' --expect-slaves 3
+        locust -f locustfile.py --csv=$CSV --headless --run-time 2m --users $user --spawn-rate '-1' --host 'http://127.0.01:8080' --expect-slaves 2
     done
     docker-compose down	
 done
@@ -37,6 +35,5 @@ echo $pid1 $pid2 $pid3
 
 kill -9 $pid1
 kill -9 $pid2
-kill -9 $pid3
 
 read -p "Press enter to continue"

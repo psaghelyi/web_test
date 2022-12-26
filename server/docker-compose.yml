@@ -16,8 +16,6 @@ services:
       context: web_golang
     expose:
       - 8080
-    ports:
-      - "8888:8080"
 
   web:
     image: webtest-web

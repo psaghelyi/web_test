@@ -1,6 +1,7 @@
-from locust import HttpUser, TaskSet, task, between
+from locust import HttpUser, TaskSet, task, between, FastHttpUser
 
-class WebsiteUser(HttpUser):
+
+class WebsiteUser(FastHttpUser):
     wait_time = between(0, 0)
 
     def on_start(self):

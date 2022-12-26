@@ -1,0 +1,61 @@
+FROM amazonlinux:2 as ruby_base
+LABEL maintainer="Projects Teams"
+
+# Bust the Cache
+RUN echo "FS-3670 Bust the Cache!"
+
+ENV RUBY_MAJOR 3.0
+ENV RUBY_VERSION 3.0.1
+ENV RUBYGEMS_VERSION 3.3.9
+ENV BUNDLER_VERSION 2.3.6
+ENV LANG=C.UTF-8
+
+ARG PG_CLIENT_VERSION=postgresql12
+ARG PG_DEV_LIB=libpq-devel
+
+# Install dependencies
+RUN yum -y update && \
+    yum install -y git ssh procps unzip file wget tar zlib-devel openssl-devel readline-devel shared-mime-info sqlite && \
+    yum groupinstall -y 'Development Tools'
+    
+# Compile CMake
+RUN wget -O cmake.tar.gz https://github.com/Kitware/CMake/releases/download/v3.20.0/cmake-3.20.0.tar.gz && \
+    mkdir -p /usr/src/cmake && \
+    tar -zxvf cmake.tar.gz -C /usr/src/cmake --strip-components=1 && \
+    rm cmake.tar.gz && \
+    cd /usr/src/cmake && \
+    ./bootstrap && \
+    make -j "$(nproc)" && \
+    make install
+
+# Compile ruby
+RUN wget -O ruby.tar.xz "https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR%-rc}/ruby-$RUBY_VERSION.tar.xz" && \
+    mkdir -p /usr/src/ruby && \
+    tar -xJf ruby.tar.xz -C /usr/src/ruby --strip-components=1 && \
+    rm ruby.tar.xz && \
+    cd /usr/src/ruby && \
+    autoconf && \
+    ./configure \
+      --build="x86_64-linux-gnu" \
+      --disable-install-doc \
+      --enable-shared && \
+    make -j "$(nproc)" && \
+    make install && \
+    cd / && \
+    rm -r /usr/src/ruby && \
+    gem update --system "$RUBYGEMS_VERSION" && \
+    gem install bundler --no-user-install --version "$BUNDLER_VERSION" --force && \
+    rm -r -f /root/.gem/
+    
+#
+# Despite the fact we don't need postgresql client and only need postgresql-devel to build native extensions for gem,
+# we should keep command to install postgresql client here, because this command makes postgresql-devel@9.6 available for us.
+# Without it postgresql-devel@9.2 (and postgresql@9.2 as its dependency) will be installed.
+RUN amazon-linux-extras install -y $PG_CLIENT_VERSION && \
+    yum install -y $PG_DEV_LIB
+
+# Document that we're going to expose port 3000
+EXPOSE 3000
+
+# Use Bash as the default command
+CMD ["/usr/bin/bash"]
