@@ -5,7 +5,6 @@ import (
 	"context"
 	"log"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"os/signal"
 	"syscall"
@@ -31,13 +30,14 @@ func main() {
 	router.GET("/wait", func(c *gin.Context) {
 		param_ms := c.DefaultQuery("ms", "200")
 		wait_ms, _ := strconv.ParseInt(param_ms, 0, 32)
-		time.Sleep(time.Duration(rand.Int63n(wait_ms)) * time.Millisecond)
+		time.Sleep(time.Duration(wait_ms) * time.Millisecond)
 		c.String(http.StatusOK, param_ms)
 	})
 
 	router.GET("/relay", func(c *gin.Context) {
+		param_ms := c.DefaultQuery("ms", "0")
 		start := time.Now()
-		_, err := http.Get("http://echo:8080")
+		_, err := http.Get("http://echo:8080/wait?ms=" + param_ms)
 		elapsed := time.Since(start)
 		
 		if err != nil {
