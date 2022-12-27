@@ -22,7 +22,7 @@ services:
     env_file:
       - ./server.env
     build:
-      context: web_bottle
+      #context: ./web_bottle
       #context: ./web_fastAPI
       #context: ./web_falcon
       #context: ./web_tornado
@@ -30,6 +30,7 @@ services:
       #context: ./web_cherrypy
       #context: ./web_django
       #context: ./web_express
+      context: ./web_rubyrails
     expose:
       - 8080
   

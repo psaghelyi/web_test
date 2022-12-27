@@ -10,5 +10,5 @@ rails_base:
 	docker build -t rails_base -f Dockerfile.rails_base .
 
 ruby_web:
-	docker build -t ruby_web -f Dockerfile.app .
+	docker build -t ruby_web .
 

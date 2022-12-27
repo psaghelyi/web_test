@@ -2,11 +2,9 @@ FROM ruby_base AS rails_base
 
 RUN gem install rails -v "~> 6.1.6.1"
 
-RUN gem install unicorn
+RUN rails new myapp -d sqlite3 --api
 
-RUN rails new app -d sqlite3 --api
-
-WORKDIR /app
+WORKDIR /myapp
 
 RUN rake db:create
 
