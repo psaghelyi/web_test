@@ -34,3 +34,20 @@ services:
     expose:
       - 8080
   
+  locust_master:
+    image: locustio/locust
+    ports:
+      - "8089:8089"
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - ./:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --master
+  
+  locust_worker:
+    image: locustio/locust
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - ./:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --worker --master-host locust_master

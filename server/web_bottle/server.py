@@ -11,12 +11,9 @@ def index():
 
 @app.route('/relay')
 def relay():
-    t0 = time.time()
     ms = bottle.request.query.ms or '0'
-    headers = {"ms": ms}
-    response = session.get('http://echo:8080/wait', headers=headers)
-    t = time.time()
-    return '{:.2f}'.format((t-t0) * 1000)
+    response = session.get('http://echo:8080/wait', params={'ms': ms})
+    return response.content
 
 @app.route('/wait')
 def wait():

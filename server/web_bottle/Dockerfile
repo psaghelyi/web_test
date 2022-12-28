@@ -6,9 +6,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 LABEL Name=web_bottle Version=0.0.1
 EXPOSE 8080
 
-WORKDIR /app
-ADD . /app
-
 COPY requirements.txt /tmp/pip-tmp/
 
 # Configure apt and install packages
@@ -29,6 +26,9 @@ RUN apt-get update \
 ENV DEBIAN_FRONTEND=dialog
 
 ENV WORKERS=4
+
+WORKDIR /app
+ADD . /app
 
 # uWSGI mode
 ENTRYPOINT ["/bin/bash", "-c", "uwsgi --http :8080 --wsgi-file server.py --process $WORKERS --die-on-term --lazy-apps --enable-threads --thunder-lock"]
