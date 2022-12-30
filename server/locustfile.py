@@ -1,4 +1,4 @@
-from locust import HttpUser, TaskSet, task, between, FastHttpUser
+from locust import task, between, HttpUser, FastHttpUser
 
 
 class WebsiteUser(FastHttpUser):
@@ -16,4 +16,4 @@ class WebsiteUser(FastHttpUser):
 
     #@task
     def relay(self):
-        self.client.get("/relay?ms=20")
+        self.client.get("/relay?ms=0")

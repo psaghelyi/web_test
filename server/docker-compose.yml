@@ -1,4 +1,8 @@
-version: '3.7'
+version: '3.8'
+
+networks:
+  web_test:
+    driver: bridge
 
 services:
   proxy:
@@ -9,6 +13,8 @@ services:
       - 8080
     ports:
       - "8080:8080"
+    networks:
+      - web_test
 
   echo:
     image: echo
@@ -16,6 +22,8 @@ services:
       context: web_golang
     expose:
       - 8080
+    networks:
+      - web_test
 
   web:
     image: webtest-web
@@ -33,21 +41,31 @@ services:
       context: ./web_rubyrails
     expose:
       - 8080
-  
+    networks:
+      - web_test
+
   locust_master:
     image: locustio/locust
+    command: -f /mnt/locust/locustfile.py --master
+    restart: always
+    volumes:
+      - ./:/mnt/locust
     ports:
       - "8089:8089"
     extra_hosts:
       - host.docker.internal:host-gateway
-    volumes:
-      - ./:/mnt/locust
-    command: -f /mnt/locust/locustfile.py --master
-  
+    networks:
+      - web_test
+    
   locust_worker:
     image: locustio/locust
-    extra_hosts:
-      - host.docker.internal:host-gateway
+    command: -f /mnt/locust/locustfile.py --worker --master-host locust_master
+    restart: always
     volumes:
       - ./:/mnt/locust
-    command: -f /mnt/locust/locustfile.py --worker --master-host locust_master
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    networks:
+      - web_test
+    depends_on:
+      - locust_master
