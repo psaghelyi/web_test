@@ -1,7 +1,4 @@
-
-
 all: ruby_base rails_base ruby_web
-
 
 ruby_base:
 	docker build -t ruby_base -f Dockerfile.ruby_base .
@@ -11,4 +8,7 @@ rails_base:
 
 ruby_web:
 	docker build -t ruby_web .
+
+run: all
+	docker run -p 8080:8080 ruby_web rails server -b 0.0.0.0 -p 8080
 

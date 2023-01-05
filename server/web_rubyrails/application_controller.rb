@@ -1,4 +1,5 @@
 require 'net/http'
+require 'benchmark'
 
 
 class ApplicationController < ActionController::API
@@ -16,9 +17,12 @@ class ApplicationController < ActionController::API
     def relay
         ms = params[:ms].presence || '0'
         begin
-            res = Net::HTTP.get_response(URI.parse('http://echo:8080/wait?ms=' + ms))
+            res = nil
+            elapsed = Benchmark.ms {
+                res = Net::HTTP.get_response(URI.parse('http://echo:8080/wait?ms=' + ms))
+            }
             if res.is_a?(Net::HTTPSuccess)
-                render :plain => res.body, :status => 200
+                render :plain => elapsed.round.to_s, :status => 200
             else
                 render :nothing => true, :status => 400
             end

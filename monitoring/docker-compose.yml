@@ -10,19 +10,15 @@ volumes:
 
 services:
   node-exporter:
-    image: prom/node-exporter:latest
+    image: quay.io/prometheus/node-exporter:latest
     container_name: node-exporter
     restart: unless-stopped
+    pid: host
     privileged: true
     volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
+      - '/:/host:ro'
     command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--path.rootfs=/host'
     expose:
       - 9100
     networks:
@@ -46,6 +42,19 @@ services:
       - /dev/disk/:/dev/disk:ro      
     expose:
       - 8080
+    networks:
+      - monitoring
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:0.10.0
+    container_name: nginx-exporter
+    restart: unless-stopped
+    command:
+      - '-nginx.scrape-uri=http://host.docker.internal:8080/stub_status'
+    expose:
+      - 9113
+    extra_hosts:
+      - host.docker.internal:host-gateway
     networks:
       - monitoring
 

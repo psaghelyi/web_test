@@ -4,24 +4,20 @@ networks:
   web_test:
     driver: bridge
 
+volumes:
+  sockets:
+
 services:
   proxy:
     image: proxy
     build:
       context: proxy_nginx
+    volumes:
+      - sockets:/sockets
     expose:
       - 8080
     ports:
       - "8080:8080"
-    networks:
-      - web_test
-
-  echo:
-    image: echo
-    build:
-      context: web_golang
-    expose:
-      - 8080
     networks:
       - web_test
 
@@ -39,33 +35,41 @@ services:
       #context: ./web_django
       #context: ./web_express
       context: ./web_rubyrails
+    volumes:
+      - sockets:/sockets
     expose:
       - 8080
     networks:
       - web_test
 
-  locust_master:
+  echo:
+    image: echo
+    build:
+      context: web_golang
+    expose:
+      - 8080
+    networks:
+      - web_test
+  
+  locust:
     image: locustio/locust
-    command: -f /mnt/locust/locustfile.py --master
+    command: -f /mnt/locust/locustfile.py --worker --master-host host.docker.internal
     restart: always
     volumes:
       - ./:/mnt/locust
-    ports:
-      - "8089:8089"
     extra_hosts:
       - host.docker.internal:host-gateway
     networks:
       - web_test
+
+#locust_master:
+  #  image: locustio/locust
+  #  command: -f /mnt/locust/locustfile.py --master
+  #  restart: always
+  #  volumes:
+  ##    - ./:/mnt/locust
+  #  extra_hosts:
+  #    - host.docker.internal:host-gateway
+  #  ports:
+  #    - "8089:8089"
     
-  locust_worker:
-    image: locustio/locust
-    command: -f /mnt/locust/locustfile.py --worker --master-host locust_master
-    restart: always
-    volumes:
-      - ./:/mnt/locust
-    extra_hosts:
-      - host.docker.internal:host-gateway
-    networks:
-      - web_test
-    depends_on:
-      - locust_master

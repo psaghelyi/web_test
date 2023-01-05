@@ -10,10 +10,10 @@ class WebsiteUser(FastHttpUser):
     def on_stop(self):
         """ on_stop is called when the TaskSet is stopping """
 
-    @task
+    #@task
     def index(self):
         self.client.get("/")
 
-    #@task
+    @task
     def relay(self):
-        self.client.get("/relay?ms=0")
+        self.client.get("/relay?ms=20")

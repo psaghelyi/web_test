@@ -1,8 +1,10 @@
 #!/bin/bash
 
-#docker-compose up --scale web=$1 > /dev/null 2>&1
+docker-compose up --scale web=1 --scale locust=4 --remove-orphans > /dev/null 2>&1 &
+pid0=$!
 
-docker-compose up --scale web=4 --scale echo=4 --scale locust_worker=4 --remove-orphans > /dev/null 2>&1
-#docker-compose up > /dev/null 2>&1
+locust --master
 
-#python ../client/client.py
+kill $pid0
+
+

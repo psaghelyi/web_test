@@ -33,7 +33,7 @@ sleep 3
 
 echo $pid1 $pid2 $pid3
 
-kill -9 $pid1
-kill -9 $pid2
+kill $pid1
+kill $pid2
 
 read -p "Press enter to continue"

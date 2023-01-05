@@ -11,7 +11,7 @@ ARG PG_DEV_LIB=libpq-devel
 
 # Install dependencies
 RUN yum -y update && \
-    yum install -y git ssh procps unzip file wget tar zlib-devel openssl-devel readline-devel shared-mime-info sqlite && \
+    yum install -y git ssh procps unzip file wget tar zlib-devel openssl-devel readline-devel shared-mime-info sqlite htop && \
     yum groupinstall -y 'Development Tools'
     
 # Compile CMake
