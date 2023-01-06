@@ -9,7 +9,7 @@ volumes:
 
 services:
   proxy:
-    image: proxy
+    image: webtest-proxy
     build:
       context: proxy_nginx
     volumes:
@@ -34,6 +34,7 @@ services:
       #context: ./web_cherrypy
       #context: ./web_django
       #context: ./web_express
+      #context: ./web_nginx
       context: ./web_rubyrails
     volumes:
       - sockets:/sockets
@@ -43,7 +44,7 @@ services:
       - web_test
 
   echo:
-    image: echo
+    image: webtest-echo
     build:
       context: web_golang
     expose:
