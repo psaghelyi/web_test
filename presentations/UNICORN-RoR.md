@@ -7,7 +7,7 @@ _Internals, Web Hosting and Scaling_
 
 ---
 
-# Unix Sockets & select()
+# Unix Sockets
 
 ---
 
@@ -58,12 +58,97 @@ Inherited resources:
 
 ---
 
+# Unicorn in Action
+
+---
+
+<!-- .slide: data-transition="convex-in none-out" -->
+<img data-src="assets/Unicorn-Page-1.svg" class="stretch"/>
+
+---
+
+<!-- .slide: data-transition="fade-in none-out" -->
+<img data-src="assets/Unicorn-Page-2.svg" class="stretch"/>
+
+---
+
+<!-- .slide: data-transition="fade-in none-out" -->
+<img data-src="assets/Unicorn-Page-3.svg" class="stretch"/>
+
+---
+
+<!-- .slide: data-transition="fade-in none-out" -->
+<img data-src="assets/Unicorn-Page-4.svg" class="stretch"/>
+
+---
+
+<!-- .slide: data-transition="fade-in none-out" -->
+<img data-src="assets/Unicorn-Page-5.svg" class="stretch"/>
+
+---
+
+<!-- .slide: data-transition="fade-in none-out" -->
+<img data-src="assets/Unicorn-Page-6.svg" class="stretch"/>
+
+---
+
+<!-- .slide: data-transition="fade-in none-out" -->
+<img data-src="assets/Unicorn-Page-7.svg" class="stretch"/>
+
+---
+
+<!-- .slide: data-transition="fade-in none-out" -->
+<img data-src="assets/Unicorn-Page-8.svg" class="stretch"/>
+
+---
+
+<!-- .slide: data-transition="fade-in none-out" -->
+<img data-src="assets/Unicorn-Page-9.svg" class="stretch"/>
+
+---
+
+<!-- .slide: data-transition="fade-in none-out" -->
+<img data-src="assets/Unicorn-Page-10.svg" class="stretch"/>
+
+---
+
+<!-- .slide: data-transition="fade-in none-out" -->
+<img data-src="assets/Unicorn-Page-11.svg" class="stretch"/>
+
+---
+
+<!-- .slide: data-transition="fade-in convex-out" -->
+<img data-src="assets/Unicorn-Page-12.svg" class="stretch"/>
+
+---
+
 # Local scaling strategies
+
+CPU Topologies
+
+* **SMP** - <font size="6">Symmetric multiprocessing</font>
+* **NUMA** - <font size="6">Non-uniform memory access</font>
+* **SMT** - <font size="6">Simultaneous multi-threading</font>
+* **IMT** - <font size="6">Interleaved multi-threading</font>
+* *...*
 
 |                     |    Pro           |       Con           | 
 |---------------------|:----------------:|:-------------------:|
 | **Multiprocessing** | Isolation        | Context switch      |
 | **Multithreading**  | Memory footprint | Unhandled exception |
+
+---
+
+# Being locked up in container
+
+* Resource limitations
+  * OOM killer
+  * freezer cgroup
+* Limited hardware topology awarness
+  * bind mount devices
+  * privileged mode
+* Image delivery (large images)
+  * local- or proxy registry
 
 ---
 
@@ -79,30 +164,7 @@ Inherited resources:
 
 ---
 
-# CPU Topologies
-
-* **SMP** - <font size="6">Symmetric multiprocessing</font>
-* **NUMA** - <font size="6">Non-uniform memory access</font>
-* **SMT** - <font size="6">Simultaneous multi-threading</font>
-* **IMT** - <font size="6">Interleaved multi-threading</font>
-* *...*
-
----
-
-# Being locked up in container
-
-* Resource limitations
-  * OOM killer
-  * freezer cgroup
-* Limited hardware topology awarness
-  * bind mount devices
-  * privileged mode
-* Large images
-  * local- or proxy registry
-
----
-
-# Orchestration in Cloud
+# Orchestration in (AWS) Cloud
 
 <img data-src="assets/Unicorn-RoR-Orchestration.svg" class="stretch"/>
 
@@ -127,10 +189,10 @@ _Docker_
 
 # 👍 _Thank You_ 👍
 
-<font size="6">**benchmarker:** [https://locust.io/](https://locust.io/)</font>
-
 <font size="6">**presentation:** [https://revealjs.com/markdown/](https://revealjs.com/markdown/)</font>
 
 <font size="6">**drawings:** [https://drawio-app.com/](https://drawio-app.com/)</font>
+
+<font size="6">**benchmarker:** [https://locust.io/](https://locust.io/)</font>
 
 <font size="6">**e-mail:** <psaghelyi@diligent.com></font>
