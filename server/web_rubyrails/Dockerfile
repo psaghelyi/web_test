@@ -6,6 +6,9 @@ ADD application_controller.rb app/controllers/
 ADD routes.rb config/
 ADD unicorn.rb config/
 
+ADD Gemfile* .
+RUN bundle install
+
 RUN mkdir -p shared/pids shared/log
 
 CMD ["unicorn", "-c", "config/unicorn.rb", "-E", "production"]

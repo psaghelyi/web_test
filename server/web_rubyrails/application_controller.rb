@@ -1,11 +1,13 @@
 require 'net/http'
 require 'benchmark'
+require 'prometheus/client'
 
 
 class ApplicationController < ActionController::API
     
     before_action :no_cache
-
+    
+    
     def index
         render :plain => 'Hello from RoR!'
     end

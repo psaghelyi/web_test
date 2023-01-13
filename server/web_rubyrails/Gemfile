@@ -1,0 +1,7 @@
+source 'https://rubygems.org'
+
+gem 'rails', '6.1.7'
+gem 'bootsnap'
+gem 'listen'
+gem 'sqlite3'
+gem 'prometheus-client'

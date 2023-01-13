@@ -1,6 +1,6 @@
 FROM ruby_base AS rails_base
 
-RUN gem install rails -v "~> 6.1.6.1"
+RUN gem install rails -v "6.1.7"
 
 RUN rails new myapp -d sqlite3 --api
 
