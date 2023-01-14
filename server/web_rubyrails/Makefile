@@ -9,6 +9,12 @@ rails_base:
 ruby_web:
 	docker build -t ruby_web .
 
-run: all
-	docker run -p 8080:8080 ruby_web rails server -b 0.0.0.0 -p 8080
+run_ruby: all
+	docker run -it --rm -p 8080:8080 ruby_base
+
+run_rails: all
+	docker run -it --rm -p 8080:8080 rails_base
+
+run_web: all
+	docker run -it --rm -p 8080:8080 ruby_web
 

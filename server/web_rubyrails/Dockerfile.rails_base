@@ -8,4 +8,5 @@ WORKDIR /myapp
 
 RUN rake db:create
 
+# run with he built-in puma webserver
 CMD ["rails", "server", "-b", "0.0.0.0", "-p", "8080"]
