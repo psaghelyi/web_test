@@ -3,6 +3,8 @@ version: '3.8'
 networks:
   web_test:
     driver: bridge
+  monitoring_monitoring:
+    external: true
 
 volumes:
   sockets:
@@ -20,6 +22,8 @@ services:
       - "8080:8080"
     networks:
       - web_test
+    depends_on:
+      - web
 
   web:
     image: webtest-web
@@ -42,6 +46,9 @@ services:
       - 8080
     networks:
       - web_test
+      - monitoring_monitoring
+    depends_on:
+      - echo
 
   echo:
     image: webtest-echo
@@ -53,7 +60,7 @@ services:
       - web_test
   
   locust:
-    image: locustio/locust
+    image: locust
     command: -f /mnt/locust/locustfile.py --worker --master-host host.docker.internal
     restart: always
     volumes:
