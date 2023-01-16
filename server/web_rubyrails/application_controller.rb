@@ -1,11 +1,18 @@
 require 'net/http'
 require 'benchmark'
 
+Rails.application.configure do
+    config.after_initialize do
+        stdout_logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
+        stdout_logger.level = Logger::INFO
+        stdout_logger.formatter = Rails.logger.formatter
+        #Rails.logger.extend(ActiveSupport::Logger.broadcast(stdout_logger))
+    end
+end
 
 class ApplicationController < ActionController::API
     
     before_action :no_cache
-    
     
     def index
         render :plain => 'Hello from RoR!'
@@ -49,4 +56,5 @@ class ApplicationController < ActionController::API
         response.headers["Cache-Control"] = 
             "no-store, no-cache, must-revalidate, max-age=0, pre-check=0, post-check=0"
     end
+
 end

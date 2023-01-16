@@ -17,20 +17,27 @@ class WebsiteUser(HttpUser):
     wait_time = constant(0)
 
     # All users will be limited to {maxsize} concurrent connections at most.
-    #pool_manager = PoolManager(maxsize=32, block=True)
+    #pool_manager = PoolManager(num_pools=10, maxsize=1024, block=True)
 
     #@task
     def index(self):
         self.client.get("/")
 
-    #@task
-    def wait(self):
-        self.client.get("/wait?ms=100")
-
     @task
+    def wait(self):
+        mystats["num_connections"] += 1
+        self.client.get("/wait?ms=100"
+            ,timeout=5
+            ,headers={'Connection':'close'}
+        )
+
+    #@task
     def relay(self):
         mystats["num_connections"] += 1
-        self.client.get("/relay?ms=100")
+        resp = self.client.get("/relay?ms=100"
+            ,timeout=5
+            ,headers={'Connection':'close'}
+        )
 
     
 
@@ -54,7 +61,7 @@ def on_init(environment, **_kwargs):
 
 
 @events.test_start.add_listener
-def on_test_start():
+def on_test_start(environment, **kwargs):
     """
     Event handler that get triggered on start a new test
     """

@@ -122,20 +122,36 @@ Inherited resources:
 
 ---
 
-# Local scaling strategies
+# Unicorn alternatives
 
-CPU Topologies
+* **[Puma](https://puma.io/)** <font size="6">- built for speed and parallelism for Rack apps</font>
+* **[Rainbows!](https://yhbt.net/rainbows/README.html)** <font size="6">- Unicorn for sleepy Rack applications</font>
+* **[Gunicorn](https://gunicorn.org/)** <font size="6">- Green Unicorn WSGI web server for Python</font>
+* **[Uvicorn](https://www.uvicorn.org/)** <font size="6">- an ASGI web server implementation for Python</font>
+* **[Falcon](https://socketry.github.io/falcon/)** <font size="6">- multi-process, multi-fiber rack-compatible HTTP server built on top of async-io and async-http</font>
+* **[uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/)** <font size="6">- old but gold (Rack, Lua WSAPI, CGI, PHP, Go …)</font>
+* **[NGINX Unit](https://unit.nginx.org/)** <font size="6">- based on NGINX (Go, JS, Java, Perl, PHP, Python, Ruby)</font>
+* **[Lamby](https://lamby.custominktech.com/)** <font size="6">- for AWS Lambda</font>
+* **...**
+
+---
+
+# "Local" scaling strategies
+
+|                     |    Pro           |       Con           | 
+|---------------------|:----------------:|:-------------------:|
+| **Multithreading**  | Memory footprint | Unhandled exception |
+| **Multiprocessing** | Isolation        | Context switch      |
+
+- - -
+
+_CPU Topologies_
 
 * **SMP** - <font size="6">Symmetric multiprocessing</font>
 * **NUMA** - <font size="6">Non-uniform memory access</font>
 * **SMT** - <font size="6">Simultaneous multi-threading</font>
 * **IMT** - <font size="6">Interleaved multi-threading</font>
 * *...*
-
-|                     |    Pro           |       Con           | 
-|---------------------|:----------------:|:-------------------:|
-| **Multiprocessing** | Isolation        | Context switch      |
-| **Multithreading**  | Memory footprint | Unhandled exception |
 
 ---
 
