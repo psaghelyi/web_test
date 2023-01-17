@@ -3,13 +3,11 @@ from locust import events, task, constant
 from locust.runners import MasterRunner, WorkerRunner
 
 from urllib3 import PoolManager
-from prometheus_client import start_http_server, Gauge
+from time import sleep
 
-from collections import defaultdict
-
-
-mystats = defaultdict(int)
-gauge_num_connections = Gauge('num_connections', 'Description of num_connections')
+from influxdb_client import Point
+from influxdb_client.client.influxdb_client import InfluxDBClient
+from influxdb_client.client.write_api import WriteApi
 
 
 
@@ -25,7 +23,6 @@ class WebsiteUser(HttpUser):
 
     @task
     def wait(self):
-        mystats["num_connections"] += 1
         self.client.get("/wait?ms=100"
             ,timeout=5
             ,headers={'Connection':'close'}
@@ -33,8 +30,7 @@ class WebsiteUser(HttpUser):
 
     #@task
     def relay(self):
-        mystats["num_connections"] += 1
-        resp = self.client.get("/relay?ms=100"
+        self.client.get("/relay?ms=100"
             ,timeout=5
             ,headers={'Connection':'close'}
         )
@@ -43,21 +39,36 @@ class WebsiteUser(HttpUser):
 
 
 
+influxdb_token = "j_jXVZmf6kIkL_Ik12BWP305ZptLRuiw8lGHhmtbhsX119nR4s2eSTrOLx09F0vX9gpfkafG5-zfsseQ3__j5w=="
+influxdb_org = "Diligent"
+influxdb_bucket = "web_test"
+
+db_client: InfluxDBClient
+write_api: WriteApi
+
+latency = []
 
 
 @events.init.add_listener
 def on_init(environment, **_kwargs):
-    if isinstance(environment.runner, MasterRunner):
-        start_http_server(8000)
+    global db_client
+    global write_api
 
-    if environment.web_ui:
-        # this code is only run on the master node (the web_ui instance doesn't exist on workers)
-        @environment.web_ui.app.route("/mystats")
-        def get_mystats():
-            """
-            Add a route to the Locust web app, where we can see the total content-length
-            """
-            return mystats
+    if isinstance(environment.runner, MasterRunner):
+        print("connecting to InfluxDB")
+        while True:
+            ready = False
+            try:
+                db_client = InfluxDBClient(url="http://localhost:8086", token=influxdb_token, org=influxdb_org)
+                ready = db_client.ping()
+            except:
+                pass
+            print(f"ready: {ready}")
+            if ready:
+                break
+            sleep(3)
+        
+        write_api = db_client.write_api()
 
 
 @events.test_start.add_listener
@@ -65,7 +76,7 @@ def on_test_start(environment, **kwargs):
     """
     Event handler that get triggered on start a new test
     """
-    mystats.clear()
+    latency.clear()
 
 
 @events.reset_stats.add_listener
@@ -73,31 +84,33 @@ def on_reset_stats():
     """
     Event handler that get triggered on click of web UI Reset Stats button
     """
-    mystats.clear()
+    latency.clear()
 
 
 @events.request.add_listener
 def on_request(request_type, name, response_time, response_length, exception, context, **kwargs):
-    mystats["num_connections"] -= 1
+    latency.append(response_time)
 
 
 @events.report_to_master.add_listener
 def on_report_to_master(client_id, data):
     """
     This event is triggered on the worker instances every time a stats report is
-    to be sent to the locust master. It will allow us to add our extra content-length
-    data to the dict that is being sent, and then we clear the local stats in the worker.
+    to be sent to the locust master.
     """
-    data["mystats"] = mystats.copy()
-    mystats.clear()
+    global latency
+    
+    data["mystats"] = latency
+    latency = []
 
 
 @events.worker_report.add_listener
 def on_worker_report(client_id, data):
     """
     This event is triggered on the master instance when a new stats report arrives
-    from a worker. Here we just add the content-length to the master's aggregated
-    stats dict.
+    from a worker.
     """
-    for k,v in data["mystats"].items():
-        mystats[k] += v
+    latency = data["mystats"]
+    # report to influxdb
+    record = [Point("latency").tag("worker", client_id).field("delay",value) for value in latency]
+    write_api.write(bucket=influxdb_bucket, org=influxdb_org, record=record)

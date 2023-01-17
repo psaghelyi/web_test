@@ -7,6 +7,7 @@ networks:
 volumes:
   prometheus_data: {}
   grafana_data: {}
+  influxdb_data: {}
 
 services:
   node-exporter:
@@ -75,9 +76,17 @@ services:
       - "9090:9090"
     networks:
       - monitoring
-    depends_on:
-      - node-exporter
-      - cadvisor
+
+  influxdb:
+    image: influxdb
+    container_name: influxdb
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    networks:
+      - monitoring
 
   grafana:
     image: grafana/grafana-enterprise
@@ -91,3 +100,4 @@ services:
       - monitoring
     depends_on:
       - prometheus
+      - influxdb

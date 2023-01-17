@@ -1,3 +1,3 @@
 FROM locustio/locust
 
-RUN pip install prometheus-client
+RUN pip install influxdb-client
