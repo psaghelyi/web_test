@@ -208,10 +208,6 @@ body {
     font-size: .65em;
 }
 
-.reveal table tr:nth-child(odd) {
-    background-color: #dae5ef;
-}
-
 .reveal table th {
     background-color: #ffffff;
     font-weight: bold;

@@ -5,11 +5,6 @@ from locust.runners import MasterRunner, WorkerRunner
 from urllib3 import PoolManager
 from time import sleep
 
-from influxdb_client import Point
-from influxdb_client.client.influxdb_client import InfluxDBClient
-from influxdb_client.client.write_api import WriteApi
-
-
 
 class WebsiteUser(HttpUser):
     wait_time = constant(0)
@@ -21,23 +16,28 @@ class WebsiteUser(HttpUser):
     def index(self):
         self.client.get("/")
 
-    @task
+    #@task
     def wait(self):
         self.client.get("/wait?ms=100"
             ,timeout=5
             ,headers={'Connection':'close'}
         )
 
-    #@task
+    @task
     def relay(self):
         self.client.get("/relay?ms=100"
             ,timeout=5
             ,headers={'Connection':'close'}
         )
 
-    
 
+'''
+---------------------------------------------------------------
+'''
 
+from influxdb_client import Point
+from influxdb_client.client.influxdb_client import InfluxDBClient
+from influxdb_client.client.write_api import WriteApi
 
 influxdb_token = "j_jXVZmf6kIkL_Ik12BWP305ZptLRuiw8lGHhmtbhsX119nR4s2eSTrOLx09F0vX9gpfkafG5-zfsseQ3__j5w=="
 influxdb_org = "Diligent"
@@ -71,22 +71,6 @@ def on_init(environment, **_kwargs):
         write_api = db_client.write_api()
 
 
-@events.test_start.add_listener
-def on_test_start(environment, **kwargs):
-    """
-    Event handler that get triggered on start a new test
-    """
-    latency.clear()
-
-
-@events.reset_stats.add_listener
-def on_reset_stats():
-    """
-    Event handler that get triggered on click of web UI Reset Stats button
-    """
-    latency.clear()
-
-
 @events.request.add_listener
 def on_request(request_type, name, response_time, response_length, exception, context, **kwargs):
     latency.append(response_time)
@@ -114,3 +98,13 @@ def on_worker_report(client_id, data):
     # report to influxdb
     record = [Point("latency").tag("worker", client_id).field("delay",value) for value in latency]
     write_api.write(bucket=influxdb_bucket, org=influxdb_org, record=record)
+
+
+@events.test_start.add_listener
+def on_test_start(environment, **kwargs):
+    latency.clear()
+
+
+@events.reset_stats.add_listener
+def on_reset_stats():
+    latency.clear()

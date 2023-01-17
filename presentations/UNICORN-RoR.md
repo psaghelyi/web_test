@@ -1,9 +1,10 @@
 ---
-title: Unicorn and RoR
+title: Web Hosting and Interpreted Apps
 ---
 
-# Unicorn w/ RoR
-_Internals, Web Hosting and Scaling_
+# Web Hosting 
+# Interpreted Apps
+_Internals, Scaling, Benchmarking_
 
 ---
 
@@ -38,15 +39,21 @@ _Internals, Web Hosting and Scaling_
 
 # fork()
 
-Inherited resources:
+<span class="fragment fade-in">
+
+_Inherited resources:_
 
 * **handles** - file, socket, ...
 * **code segments**
 * **data segments** - copy-on-write 
 
+</span>
+
 ---
 
 # Unix Signals
+
+<span class="fragment fade-in">
 
 * **INT / TERM** - <font size="6">quick shutdown, kills all workers</font>
 * **QUIT** - <font size="6">graceful shutdown</font>
@@ -55,6 +62,8 @@ Inherited resources:
 * **TTIN / TTOU** - <font size="6">increase/decrease the number of wokers</font>
 * **HUP** - <font size="6">reload the configuraion file</font>
 * **WINCH** -  <font size="6">keep master running, gracefully stop workers</font>
+
+</span>
 
 ---
 
@@ -138,14 +147,18 @@ Inherited resources:
 
 # "Local" scaling strategies
 
+<span class="fragment fade-in">
+
 |                     |    Pro           |       Con           | 
 |---------------------|:----------------:|:-------------------:|
-| **Multithreading**  | Memory footprint | Unhandled exception |
-| **Multiprocessing** | Isolation        | Context switch      |
+| **Multithreading**  | Memory footprint<!-- .element: class="fragment" --> | Unhandled exception<!-- .element: class="fragment" --> |
+| **Multiprocessing** | Isolation<!-- .element: class="fragment" -->        | Context switch<!-- .element: class="fragment" -->      |
+
+<span class="fragment fade-in">
 
 - - -
 
-_CPU Topologies_
+_CPU-Memory Topologies_
 
 * **SMP** - <font size="6">Symmetric multiprocessing</font>
 * **NUMA** - <font size="6">Non-uniform memory access</font>
@@ -153,17 +166,28 @@ _CPU Topologies_
 * **IMT** - <font size="6">Interleaved multi-threading</font>
 * *...*
 
+</span>
+</span>
+
+---
+
+<!-- .slide: data-transition="fade-in convex-out" -->
+<img data-src="assets/sad.jpg" class="stretch"/>
+
 ---
 
 # Being locked up in container
 
 * Resource limitations
+<!-- .element: class="fragment" -->
   * OOM killer
   * freezer cgroup
-* Limited hardware topology awarness
+* Limited hardware topology awareness
+<!-- .element: class="fragment" -->
   * bind mount devices
   * privileged mode
 * Image delivery (large images)
+<!-- .element: class="fragment" -->
   * local- or proxy registry
 
 ---
