@@ -5,7 +5,6 @@ RUN yarn
 COPY . .
 EXPOSE 8080
 
-ENV WORKERS=6
+ENV WORKERS=2
 
-ENTRYPOINT ["/bin/bash", "-c", \
-    "yarn start -i $WORKERS"]
+ENTRYPOINT ["/bin/bash", "-c", "yarn start -i $WORKERS"]

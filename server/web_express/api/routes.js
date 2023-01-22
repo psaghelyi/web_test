@@ -1,40 +1,33 @@
 import { Router } from 'express';
-import request from 'request';
+import axios from 'axios';
 
 let router = Router();
 
-router.get('/', (req, res) => {
+router.get("/", (req, res) => {
   res.status(200).send('hello from express');
-});
+})
 
-router.get('/wait/:ms', async (req, res) => {
-  const timeout = ms => new Promise(resolve => setTimeout(resolve, ms));
+router.get('/wait', async (req, res) => {
   try {
-    await timeout(parseInt(req.params.ms));
-    res.status(200).send('OK');
+    const ms = req.query.ms
+    setTimeout(function() {
+      res.status(200).send(ms);
+    }, parseInt(ms));    
   } catch (e) {
     res.sendStatus(500);
   }
 });
 
-router.get('/relay', async (req, res) => {
-  const httpRequest = url =>
-    new Promise((resolve, reject) => {
-      request.get(url, (err, response) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(response);
-      });
-    });
-
-  try {
-    const result = await httpRequest('http://echo:8080');
-    res.status(200).send(result.statusCode);
-  } catch (e) {
-    res.sendStatus(500);
-  }
-});
+router.get("/relay", (req, res) => {
+  var start = process.hrtime();
+  axios.get("http://echo:8080/wait?ms=" + req.query.ms)
+    .then(function(response) {
+      var elapsed = process.hrtime(start)[1] / 1000000;
+      res.status(200).json(Math.round(elapsed))
+    }).catch(function(error) {
+      res.sendStatus(500);
+    })
+})
 
 export const registerRoutes = app => {
   app.use('/', router);

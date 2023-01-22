@@ -184,7 +184,7 @@ _CPU-Memory Topologies_
   * freezer cgroup
 * Limited hardware topology awareness
 <!-- .element: class="fragment" -->
-  * bind mount devices
+  * bind mount HW devices
   * privileged mode
 * Image delivery (large images)
 <!-- .element: class="fragment" -->

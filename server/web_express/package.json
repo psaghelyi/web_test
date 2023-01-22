@@ -1,38 +1,32 @@
 {
-  "name": "ubiconf",
+  "name": "web_express",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
     "dev": "cross-env NODE_ENV=dev nodemon -e js index.js --watch .",
-    "start": "cross-env NODE_ENV=prod pm2-runtime index.js",
-    "lint": "eslint --ext .js --ignore-path .gitignore ."
+    "start": "cross-env NODE_ENV=prod pm2-runtime index.js"
   },
   "devDependencies": {
-    "babel-eslint": "^10.1.0",
-    "cross-env": "^7.0.0",
-    "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.10.0",
-    "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-prettier": "^3.1.2",
-    "loadtest": "^4.1.0",
-    "nodemon": "^2.0.2",
-    "prettier": "^1.19.1"
+    "loadtest": "^4.2.0",
+    "nodemon": "^2.0.20"
   },
   "dependencies": {
-    "@babel/core": "^7.8.6",
-    "@babel/polyfill": "^7.8.3",
-    "@babel/preset-env": "^7.8.6",
-    "@babel/register": "^7.8.6",
-    "babel-plugin-root-import": "^6.4.1",
+    "@babel/core": "^7.20.12",
+    "@babel/polyfill": "^7.12.1",
+    "@babel/preset-env": "^7.20.2",
+    "@babel/register": "^7.18.9",
+    "axios": "^1.2.3",
+    "babel-plugin-root-import": "^6.6.0",
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
-    "cookie-parser": "^1.4.4",
-    "express": "^4.17.1",
-    "express-winston": "^4.0.3",
-    "pm2": "^4.2.3",
+    "cookie-parser": "^1.4.6",
+    "cross-env": "^7.0.3",
+    "express": "^4.18.2",
+    "express-winston": "^4.2.0",
+    "pm2": "^5.2.2",
     "request": "^2.88.2",
     "sync-request": "^6.1.0",
-    "winston": "^3.2.1"
+    "winston": "^3.8.2"
   }
 }
