@@ -24,7 +24,7 @@ def relay():
 
 @app.route('/wait')
 def wait():
-    ms = bottle.request.query.ms or '200'
+    ms = bottle.request.query.ms or '0'
     time.sleep(int(ms)/1000.)
     return ms
 

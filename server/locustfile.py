@@ -14,7 +14,10 @@ class WebsiteUser(HttpUser):
 
     #@task
     def index(self):
-        self.client.get("/")
+        self.client.get("/"
+            ,timeout=5
+            ,headers={'Connection':'close'}
+        )
 
     #@task
     def wait(self):
@@ -96,7 +99,7 @@ def on_worker_report(client_id, data):
     """
     latency = data["mystats"]
     # report to influxdb
-    record = [Point("latency").tag("worker", client_id).field("delay",value) for value in latency]
+    record = [Point("latency").tag("worker", client_id).field("delay",float(value)) for value in latency]
     write_api.write(bucket=influxdb_bucket, org=influxdb_org, record=record)
 
 

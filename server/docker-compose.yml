@@ -38,6 +38,7 @@ services:
       #context: ./web_cherrypy
       #context: ./web_django
       #context: ./web_express
+      #context: ./web_golang
       #context: ./web_nginx
       context: ./web_rubyrails
     volumes:
