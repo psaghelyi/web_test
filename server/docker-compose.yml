@@ -12,6 +12,7 @@ volumes:
 services:
   proxy:
     image: webtest-proxy
+    restart: unless-stopped
     build:
       context: proxy_nginx
     volumes:
@@ -27,6 +28,7 @@ services:
 
   web:
     image: webtest-web
+    restart: unless-stopped
     env_file:
       - ./server.env
     build:
@@ -53,6 +55,7 @@ services:
 
   echo:
     image: webtest-echo
+    restart: unless-stopped
     build:
       context: web_golang
     expose:
@@ -63,7 +66,7 @@ services:
   locust:
     image: locust
     command: -f /mnt/locust/locustfile.py --worker --master-host host.docker.internal
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./:/mnt/locust
     extra_hosts:
