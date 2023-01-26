@@ -6,7 +6,7 @@ from urllib3 import PoolManager
 from time import sleep
 
 
-class WebsiteUser(HttpUser):
+class WebsiteUser(FastHttpUser):
     wait_time = constant(0)
 
     # All users will be limited to {maxsize} concurrent connections at most.

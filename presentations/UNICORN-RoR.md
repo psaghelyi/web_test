@@ -43,9 +43,12 @@ _Internals, Scaling, Benchmarking_
 
 _Inherited resources:_
 
-* **handles** - file, socket, ...
-* **code segments**
-* **data segments** - copy-on-write 
+* **code segments** - the code it's executing
+* **data segments** - the static part (copy-on-write)
+* **heap** - the space for dynamic allocations
+* **user id** - with access rights
+* **working directory** - and environment variables
+* **open file descriptors** - files, sockets, devices...
 
 </span>
 
@@ -141,7 +144,7 @@ _Inherited resources:_
 * **[uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/)** <font size="6">- old but gold (Rack, Lua WSAPI, CGI, PHP, Go …)</font>
 * **[NGINX Unit](https://unit.nginx.org/)** <font size="6">- based on NGINX (Go, JS, Java, Perl, PHP, Python, Ruby)</font>
 * **[Lamby](https://lamby.custominktech.com/)** <font size="6">- for AWS Lambda</font>
-* **...**
+* **[PM2](https://pm2.keymetrics.io/)** <font size="6">- advanced, production process manager for node.js</font>
 
 ---
 
