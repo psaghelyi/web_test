@@ -33,6 +33,13 @@ class WebsiteUser(FastHttpUser):
             ,headers={'Connection':'close'}
         )
 
+    #@task
+    def batch_relay(self):
+        self.client.get("/batch_relay?ms=100&batch=10"
+            ,timeout=5
+            ,headers={'Connection':'close'}
+        )
+
 
 '''
 ---------------------------------------------------------------

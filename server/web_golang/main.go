@@ -1,15 +1,15 @@
-
 package main
 
 import (
 	"context"
-	"log"
 	"fmt"
+	"log"
+	"math/rand"
 	"net/http"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,6 +22,7 @@ func main() {
 	// Default With the Logger and Recovery middleware already attached
 	// use gin.New() if you want to skip middlewares
 	router := gin.Default()
+	//router := gin.New()
 
 	router.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "Hello from GoLang - Gin Server")
@@ -34,12 +35,19 @@ func main() {
 		c.String(http.StatusOK, param_ms)
 	})
 
+	router.GET("/waitrnd", func(c *gin.Context) {
+		param_ms := c.DefaultQuery("ms", "200")
+		wait_ms, _ := strconv.ParseInt(param_ms, 0, 32)
+		time.Sleep(time.Duration(rand.Int63n(wait_ms)) * time.Millisecond)
+		c.String(http.StatusOK, param_ms)
+	})
+
 	router.GET("/relay", func(c *gin.Context) {
 		param_ms := c.DefaultQuery("ms", "0")
 		start := time.Now()
 		_, err := http.Get("http://echo:8080/wait?ms=" + param_ms)
 		elapsed := time.Since(start)
-		
+
 		if err != nil {
 			fmt.Printf("error making http request: %s\n", err)
 		}

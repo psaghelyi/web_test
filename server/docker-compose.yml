@@ -73,6 +73,8 @@ services:
       - host.docker.internal:host-gateway
     networks:
       - web_test
+    depends_on:
+      - proxy
 
 #locust_master:
   #  image: locustio/locust

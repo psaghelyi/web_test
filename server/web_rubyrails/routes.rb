@@ -8,4 +8,6 @@ Rails.application.routes.draw do
   get '/wait' => 'application#wait'
 
   get '/relay' => 'application#relay'
+
+  get '/batch_relay' => 'application#batch_relay'
 end
