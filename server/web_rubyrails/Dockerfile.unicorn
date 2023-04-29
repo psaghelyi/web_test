@@ -6,7 +6,7 @@ ADD application_controller.rb app/controllers/
 ADD routes.rb config/
 ADD unicorn.rb config/
 
-ADD Gemfile* .
+ADD Gemfile .
 RUN bundle install
 
 RUN mkdir -p shared/pids shared/log
