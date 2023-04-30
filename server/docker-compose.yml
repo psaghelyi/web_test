@@ -43,6 +43,7 @@ services:
       #context: ./web_golang
       #context: ./web_nginx
       context: ./web_rubyrails
+      dockerfile: Dockerfile.puma
     volumes:
       - sockets:/sockets
     expose:
