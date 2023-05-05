@@ -43,6 +43,7 @@ services:
       #context: ./web_golang
       #context: ./web_nginx
       context: ./web_rubyrails
+      #dockerfile: Dockerfile.unicorn
       dockerfile: Dockerfile.puma
     volumes:
       - sockets:/sockets
@@ -75,6 +76,7 @@ services:
     networks:
       - web_test
     depends_on:
+      - web
       - proxy
 
 #locust_master:

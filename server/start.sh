@@ -1,10 +1,7 @@
 #!/bin/bash
 
-docker-compose up --scale web=8 --scale locust=4 --build --remove-orphans &# > /dev/null 2>&1 &
-pid0=$!
+docker compose up --scale web=8 --scale locust=4 --build --remove-orphans -d
 
 locust --master
 
-kill $pid0
-
-
+docker compose down

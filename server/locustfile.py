@@ -41,15 +41,13 @@ class WebsiteUser(FastHttpUser):
         )
 
 
-'''
----------------------------------------------------------------
-'''
+'''---------------------------------------------------------------'''
 
 from influxdb_client import Point
 from influxdb_client.client.influxdb_client import InfluxDBClient
 from influxdb_client.client.write_api import WriteApi
 
-influxdb_token = "j_jXVZmf6kIkL_Ik12BWP305ZptLRuiw8lGHhmtbhsX119nR4s2eSTrOLx09F0vX9gpfkafG5-zfsseQ3__j5w=="
+influxdb_token = "XeeV-ceRFjeReJVoGbkSmrT-ePscQ24wPuck8qmncX_fdxFUvjc97M52j9SvB8W-dN1D1Y5KKJFgav2rrfh5UA=="
 influxdb_org = "Diligent"
 influxdb_bucket = "web_test"
 
@@ -86,24 +84,28 @@ def on_request(request_type, name, response_time, response_length, exception, co
     latency.append(response_time)
 
 
+'''
+This event is triggered on the worker instances every time a stats report is
+to be sent to the locust master.
+'''
 @events.report_to_master.add_listener
 def on_report_to_master(client_id, data):
-    """
-    This event is triggered on the worker instances every time a stats report is
-    to be sent to the locust master.
-    """
     global latency
-    
+    if not latency:
+        return    
     data["mystats"] = latency
     latency = []
 
 
+'''
+This event is triggered on the master instance when a new stats report arrives
+from a worker.
+'''
 @events.worker_report.add_listener
 def on_worker_report(client_id, data):
-    """
-    This event is triggered on the master instance when a new stats report arrives
-    from a worker.
-    """
+    global write_api
+    if not write_api or "mystats" not in data or not data["mystats"]:
+        return    
     latency = data["mystats"]
     # report to influxdb
     record = [Point("latency").tag("worker", client_id).field("delay",float(value)) for value in latency]
