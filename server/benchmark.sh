@@ -19,7 +19,7 @@ do
         ((COUNTER++))
         CSV="benchmark""_instance$instance""_user$user"
         echo "$COUNTER experience:"
-        locust -f locustfile.py --csv=$CSV --headless --run-time 2m --users $user --spawn-rate '-1' --host 'http://127.0.01:8080' --expect-slaves 2
+        locust -f locustfile.py --csv=$CSV --headless --run-time 2m --users $user --spawn-rate '-1' --host 'http://127.0.0.1:8080' --expect-slaves 2
     done
     docker-compose down	
 done

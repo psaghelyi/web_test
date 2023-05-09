@@ -50,8 +50,5 @@ RUN wget -O ruby.tar.xz "https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR%-rc}/
 RUN amazon-linux-extras install -y $PG_CLIENT_VERSION && \
     yum install -y $PG_DEV_LIB
 
-# Document that we're going to expose port 8080
-EXPOSE 8080
-
 # Use Bash as the default command
 CMD ["/usr/bin/bash"]

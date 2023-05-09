@@ -11,6 +11,4 @@ RUN bundle install
 
 RUN mkdir -p shared/pids shared/log
 
-EXPOSE 8080
-
 CMD ["unicorn", "-c", "config/unicorn.rb", "-E", "production"]

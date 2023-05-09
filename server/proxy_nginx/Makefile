@@ -1,0 +1,12 @@
+registry = registry.127.0.0.1.nip.io:5000
+
+all: build push
+
+build:
+	docker build -t $(registry)/proxy_nginx .
+
+push:
+	docker push $(registry)/proxy_nginx
+
+run: build
+	docker run -it --rm -p 80:8080 proxy_nginx

@@ -15,19 +15,19 @@ class ApplicationController < ActionController::API
     
     before_action :no_cache
     
-    # http://localhost:8080/
+    # /
     def index
         render :plain => 'Hello from RoR!'
     end
 
-    # http://localhost:8080/wait?ms=1000
+    # /wait?ms=1000
     def wait
         ms = params[:ms].presence || '200'
         sleep (ms.to_f/1000.0)
         render :plain => ms
     end
 
-    # http://localhost:8080/relay?ms=1000
+    # /relay?ms=1000
     def relay
         ms = params[:ms].presence || '0'
         begin
@@ -46,7 +46,7 @@ class ApplicationController < ActionController::API
         end
     end
 
-    # http://localhost:8080/batch_relay?ms=1000&batch=10
+    # /batch_relay?ms=1000&batch=10
     def batch_relay
         ms = params[:ms].presence || '0'
         threads = []
