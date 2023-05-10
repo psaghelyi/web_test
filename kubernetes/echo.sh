@@ -1,7 +1,5 @@
 #!/bin/bash
 
-kubectl create namespace web-test
-
 cat <<EOF | kubectl apply -f -
 apiVersion: apps/v1
 kind: Deployment
@@ -24,10 +22,14 @@ spec:
         - name: echo
           image: registry.127.0.0.1.nip.io:5000/web_golang
           ports:
-            - containerPort: 8080 
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /
 EOF
 
-kubectl --namespace web-test expose deployment echo --port=8080 --target-port=8080 --protocol=TCP --type=ClusterIP
+kubectl --namespace web-test expose deployment echo
 
 
 

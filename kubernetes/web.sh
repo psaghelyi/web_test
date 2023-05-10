@@ -1,7 +1,5 @@
 #!/bin/bash
 
-kubectl create namespace web-test
-
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: ConfigMap
@@ -65,15 +63,27 @@ spec:
           image: registry.127.0.0.1.nip.io:5000/web_unicorn
           env:
             - name: WORKERS
-              value: "2"
+              value: "5"
           ports:
             - containerPort: 8080
               name: web
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /
+            timeoutSeconds: 5
+            failureThreshold: 3
         - name: proxy
           image: nginx:alpine
           ports:
             - containerPort: 8000
               name: proxy
+          livenessProbe:
+            httpGet:
+              port: 8000
+              path: /
+            timeoutSeconds: 5
+            failureThreshold: 3
           volumeMounts:
             - name: nginx-proxy-config
               mountPath: /etc/nginx/nginx.conf
@@ -85,7 +95,7 @@ spec:
           
 EOF
 
-kubectl --namespace web-test expose deployment web --port=8000 --target-port=8000 --protocol=TCP --type=ClusterIP
+kubectl --namespace web-test expose deployment web
 
 
 

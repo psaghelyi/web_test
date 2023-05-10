@@ -21,21 +21,21 @@ class WebsiteUser(FastHttpUser):
 
     #@task
     def wait(self):
-        self.client.get("/wait?ms=100"
+        self.client.get("/wait?ms=200"
             ,timeout=5
             ,headers={'Connection':'close'}
         )
 
     @task
     def relay(self):
-        self.client.get("/relay?ms=100"
+        self.client.get("/relay?ms=200"
             ,timeout=5
             ,headers={'Connection':'close'}
         )
 
     #@task
     def batch_relay(self):
-        self.client.get("/batch_relay?ms=100&batch=10"
+        self.client.get("/batch_relay?ms=200&batch=10"
             ,timeout=5
             ,headers={'Connection':'close'}
         )
@@ -47,9 +47,9 @@ from influxdb_client import Point
 from influxdb_client.client.influxdb_client import InfluxDBClient
 from influxdb_client.client.write_api import WriteApi
 
-influxdb_token = "XeeV-ceRFjeReJVoGbkSmrT-ePscQ24wPuck8qmncX_fdxFUvjc97M52j9SvB8W-dN1D1Y5KKJFgav2rrfh5UA=="
-influxdb_org = "Diligent"
-influxdb_bucket = "web_test"
+influxdb_token = "secret-token"
+influxdb_org = "InfluxData"
+influxdb_bucket = "kubernetes"
 
 db_client: InfluxDBClient
 write_api: WriteApi
