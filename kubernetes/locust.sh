@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: locust
-          image: registry.127.0.0.1.nip.io:5000/locust
+          image: ${REGISTRY:=registry.127.0.0.1.nip.io:5000}/locust
           args: ["-f", "/locust/locustfile.py", "--worker", "--master-host", "host.k3d.internal"]
           volumeMounts:
             - name: locustfile

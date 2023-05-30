@@ -11,7 +11,7 @@ COUNTER=0
 
 for instance in {5..40..5} 45 50 60 80 100
 do
-    echo "WORKERS=$instance" > server.env
+    echo "WORKERS=$instance" > .env
     docker-compose up -d > /dev/null 2>&1
     sleep 2
     for user in {5..40..5} 45 50 60 80 100

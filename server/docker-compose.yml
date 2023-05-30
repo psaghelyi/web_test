@@ -27,10 +27,8 @@ services:
       - web
 
   web:
-    image: registry.127.0.0.1.nip.io:5000/webtest-web
+    image: "${REGISTRY}/webtest-web"
     restart: unless-stopped
-    env_file:
-      - ./server.env
     build:
       #context: ./web_bottle
       #context: ./web_fastAPI
@@ -56,7 +54,7 @@ services:
       - echo
 
   echo:
-    image: registry.127.0.0.1.nip.io:5000/webtest-echo
+    image: "${REGISTRY}/webtest-echo"
     restart: unless-stopped
     build:
       context: web_golang
@@ -66,7 +64,7 @@ services:
       - web_test
   
   locust:
-    image: registry.127.0.0.1.nip.io:5000/locust
+    image: "${REGISTRY}/locust"
     command: -f /mnt/locust/locustfile.py --worker --master-host host.docker.internal
     restart: unless-stopped
     volumes:

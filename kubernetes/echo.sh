@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: echo
-          image: registry.127.0.0.1.nip.io:5000/web_golang
+          image: ${REGISTRY:=registry.127.0.0.1.nip.io:5000}/web_golang
           ports:
             - containerPort: 8080
           livenessProbe:
