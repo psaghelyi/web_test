@@ -1,4 +1,4 @@
-registry = psaghelyi
+registry=$${REGISTRY:=psaghelyi}
 
 all: build push
 

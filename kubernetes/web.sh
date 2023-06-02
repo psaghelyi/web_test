@@ -60,7 +60,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: ${REGISTRY:=registry.127.0.0.1.nip.io:5000}/web_puma
+          image: ${REGISTRY:=psaghelyi}/web_unicorn
           env:
             - name: WORKERS
               value: "5"
