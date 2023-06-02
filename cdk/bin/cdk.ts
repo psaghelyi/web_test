@@ -1,13 +1,12 @@
 #!/usr/bin/env node
-import 'source-map-support/register';
-import * as cdk from 'aws-cdk-lib';
-import { CdkStack } from '../lib/cdk-stack';
-
+import "source-map-support/register";
+// import { App } from "aws-cdk-lib";
 import { FargateClusterStack } from '../lib/fargate-cluster';
+import { App } from "aws-cdk-lib";
 
-const app = new cdk.App();
+const app = new App();
 new FargateClusterStack(app, 'WebTestCluster', { 
     env: { account: '528896239059', region: 'eu-central-1' },
     
-    clusterName: 'WebTestCluster'
+    // clusterName: 'WebTestCluster'
   });
