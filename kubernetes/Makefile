@@ -15,6 +15,10 @@ run: clean
 	./web.sh
 	./locust.sh
 
+inject:
+	kubectl wait --for=condition=Ready pod --all -n web-test
+	kubectl get -n web-test deploy -o yaml | linkerd inject - | kubectl apply -f -
+
 bench:
 	cd ../server; locust --master
 
