@@ -1,5 +1,9 @@
 {
     "python.pythonPath": "/Users/peter.saghelyi/virtualenvs/web_fastapi/bin/python",
     "python.linting.enabled": false,
-    "python.linting.pylintEnabled": false
+    "python.linting.pylintEnabled": false,
+    "yaml.schemas": {
+        "kubernetes": "*.yaml",
+        "aws:/Users/psaghelyi-remote/Library/Application%20Support/Code/User/globalStorage/amazonwebservices.aws-toolkit-vscode/sam.schema.json": "file:///Users/psaghelyi-remote/Project/github/psaghelyi/web_test/cdk/aws-template.yaml"
+    }
 }

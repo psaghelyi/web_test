@@ -8,5 +8,5 @@ build:
 push:
 	docker push $(registry)/web_golang
 
-run: build
-	docker run -it --rm -p 80:5100 web_golang
+run:
+	docker run -it --rm -p 8080:8080 $(registry)/web_golang

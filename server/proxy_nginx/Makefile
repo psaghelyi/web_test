@@ -9,4 +9,4 @@ push:
 	docker push $(registry)/proxy_nginx
 
 run: build
-	docker run -it --rm -p 80:8080 proxy_nginx
+	docker run -it --rm -p 8000:8000 $(registry)/proxy_nginx
