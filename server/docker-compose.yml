@@ -65,10 +65,10 @@ services:
   
   locust:
     image: "${REGISTRY}/locust"
-    command: -f /mnt/locust/locustfile.py --worker --master-host host.docker.internal
+    command: -f /locust/locustfile.py --worker --master-host host.docker.internal
     restart: unless-stopped
     volumes:
-      - ./:/mnt/locust
+      - ./locust:/locust
     extra_hosts:
       - host.docker.internal:host-gateway
     networks:

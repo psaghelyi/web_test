@@ -1,6 +1,6 @@
 #!/bin/bash
 
-kubectl create configmap locustfile --namespace web-test --from-file ../server/locustfile.py
+kubectl create configmap locustfile --namespace web-test --from-file ../server/locust/locustfile.py
 
 cat <<EOF | kubectl apply -f -
 apiVersion: apps/v1

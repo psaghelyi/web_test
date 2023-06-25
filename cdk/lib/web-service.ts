@@ -16,11 +16,13 @@ export function createWebService(stack: cdk.Stack, cluster: ecs.Cluster) : void 
   webTaskDefinition.addContainer('ProxyContainer', {
     image: proxyImage,
     portMappings: [{ containerPort: 8000 }],
+    logging: new ecs.AwsLogDriver({ streamPrefix: 'proxy' }),  // Optional
   });
 
   webTaskDefinition.addContainer('WebContainer', {
     image: webImage,
     portMappings: [{ containerPort: 8080 }],
+    logging: new ecs.AwsLogDriver({ streamPrefix: 'web' }),  // Optional
     environment: {
       'WORKERS': '4',
     },
@@ -29,7 +31,7 @@ export function createWebService(stack: cdk.Stack, cluster: ecs.Cluster) : void 
   const webService = new ecs_patterns.NetworkLoadBalancedFargateService(stack, 'WebService', {
     cluster,
     taskDefinition: webTaskDefinition,
-    desiredCount: 8,
+    desiredCount: 4,
     cloudMapOptions: {
       name: 'web',
       containerPort: 8000,

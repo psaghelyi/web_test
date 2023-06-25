@@ -6,6 +6,7 @@ import { Construct } from 'constructs';
 
 import { createEchoService } from './echo-service';
 import { createWebService } from './web-service';
+import { createInfluxdbService } from './influxdb-service';
 import { createLocustService } from './locust-service';
 
 export class FargateClusterStack extends cdk.Stack {
@@ -29,6 +30,7 @@ export class FargateClusterStack extends cdk.Stack {
 
     createEchoService(this, cluster);
     createWebService(this, cluster);
+    createInfluxdbService(this, cluster);
     //createLocustService(this, cluster);
     
 

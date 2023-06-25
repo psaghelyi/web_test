@@ -29,11 +29,11 @@ class ApplicationController < ActionController::API
 
     # /relay?ms=1000
     def relay
-        ms = params[:ms].presence || '0'
+        target = params[:target].presence || 'http://echo:8080'
         begin
             res = nil
             elapsed = Benchmark.ms {
-                res = Net::HTTP.get_response(URI.parse('http://echo:8080/waitrnd?ms=' + ms))
+                res = Net::HTTP.get_response(URI.parse(target))
             }
             if res.is_a?(Net::HTTPSuccess)
                 render :plain => elapsed.round.to_s, :status => 200
@@ -48,14 +48,14 @@ class ApplicationController < ActionController::API
 
     # /batch_relay?ms=1000&batch=10
     def batch_relay
-        ms = params[:ms].presence || '0'
+        target = params[:target].presence || 'http://echo:8080'
         threads = []
         begin
             succeed = true
             elapsed = Benchmark.ms {
                 for b in 1..params[:batch].to_i do
                     threads << Thread.new { 
-                        res = Net::HTTP.get_response(URI.parse('http://echo:8080/waitrnd?ms=' + ms))
+                        res = Net::HTTP.get_response(URI.parse(target))
                         if not res.is_a?(Net::HTTPSuccess)
                             succeed = false
                         end
