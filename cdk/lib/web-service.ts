@@ -6,7 +6,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns';
 
 
-export function createWebService(stack: cdk.Stack, cluster: ecs.Cluster) : void {
+export function createWebService(stack: cdk.Stack, cluster: ecs.Cluster) : ecs.FargateService {
 
   const webTaskDefinition = new ecs.FargateTaskDefinition(stack, 'WebTaskDefinition', {
     memoryLimitMiB: 512,
@@ -49,4 +49,5 @@ export function createWebService(stack: cdk.Stack, cluster: ecs.Cluster) : void 
 
   webService.service.connections.allowFromAnyIpv4(allPorts);
 
+  return webService.service;
 }

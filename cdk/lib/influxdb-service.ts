@@ -4,7 +4,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns';
 
 
-export function createInfluxdbService(stack: cdk.Stack, cluster: ecs.Cluster) : void {
+export function createInfluxdbService(stack: cdk.Stack, cluster: ecs.Cluster) : ecs.FargateService {
 
   const influxdbTaskDefinition = new ecs.FargateTaskDefinition(stack, 'InfluxdbTaskDefinition', {
     memoryLimitMiB: 512,
@@ -38,4 +38,5 @@ export function createInfluxdbService(stack: cdk.Stack, cluster: ecs.Cluster) : 
 
   influxdbService.service.connections.allowFromAnyIpv4(allPorts);
 
+  return influxdbService.service;
 }

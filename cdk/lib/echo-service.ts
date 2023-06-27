@@ -6,7 +6,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns';
 
 
-export function createEchoService(stack: cdk.Stack, cluster: ecs.Cluster) : void {
+export function createEchoService(stack: cdk.Stack, cluster: ecs.Cluster) : ecs.FargateService {
 
   const echoTaskDefinition = new ecs.FargateTaskDefinition(stack, 'EchoTaskDefinition', {
     memoryLimitMiB: 512,
@@ -50,4 +50,5 @@ export function createEchoService(stack: cdk.Stack, cluster: ecs.Cluster) : void
 
   echoService.service.connections.allowFromAnyIpv4(allPorts);
 
+  return echoService.service;
 }

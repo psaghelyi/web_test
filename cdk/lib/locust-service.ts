@@ -6,7 +6,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns';
 
 
-export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster) : void {
+export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster) : ecs.FargateService {
 
   // Define the Locust Task Definitions
   const locustWorkerTaskDefinition = new ecs.FargateTaskDefinition(stack, 'LocustWorkerTaskDefinition', {
@@ -16,7 +16,12 @@ export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster) : vo
 
   locustWorkerTaskDefinition.addContainer('LocustWorkerContainer', {
     image: locustImage,
-    command: ['locust', '-f', '/locust/locustfile.py', '--worker', '--master-host', 'locust.local'],
+    command: ['-f', '/locust/locustfile.py', '--worker', '--master-host', 'locust.local'],
+    environment: {
+      'LOGGER_LEVEL': 'DEBUG',
+      'INFLUXDB_PATH': 'http://influxdb.local:8086',
+    },
+    logging: new ecs.AwsLogDriver({ streamPrefix: 'locust-worker' }),  // Optional
   });
 
 
@@ -27,9 +32,13 @@ export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster) : vo
 
   locustMasterTaskDefinition.addContainer('LocustMasterContainer', {
     image: locustImage,
-    command: ['locust', '--master', '--host', 'http://web.local:8000'],
+    command: ['-f', '/locust/locustfile.py', '--master', '--host', 'http://web.local:8000'],
+    environment: {
+      'LOGGER_LEVEL': 'DEBUG',
+      'INFLUXDB_PATH': 'http://influxdb.local:8086',
+    },
     portMappings: [{ containerPort: 8089 }],
-    logging: new ecs.AwsLogDriver({ streamPrefix: 'locust' }),  // Optional
+    logging: new ecs.AwsLogDriver({ streamPrefix: 'locust-master' }),  // Optional
   });
 
 
@@ -50,6 +59,7 @@ export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster) : vo
       containerPort: 8089,
     },
     publicLoadBalancer: true,
+    listenerPort: 8089,
   });
   
   const allPorts = new ec2.Port({
@@ -61,4 +71,7 @@ export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster) : vo
 
   locustMaterService.service.connections.allowFromAnyIpv4(allPorts);
 
+  locustWorkerService.node.addDependency(locustMaterService.service);
+
+  return locustWorkerService;
 }

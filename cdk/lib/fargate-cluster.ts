@@ -28,13 +28,13 @@ export class FargateClusterStack extends cdk.Stack {
     cluster.addDefaultCloudMapNamespace({ name: 'local' });
 
 
-    createEchoService(this, cluster);
-    createWebService(this, cluster);
-    createInfluxdbService(this, cluster);
-    //createLocustService(this, cluster);
+    const echoService = createEchoService(this, cluster);
+    const webService = createWebService(this, cluster);
+    const influxdbService = createInfluxdbService(this, cluster);
+    const locustService = createLocustService(this, cluster);
     
-
-    
+    webService.node.addDependency(echoService);
+    locustService.node.addDependency(influxdbService);
     
 
 
