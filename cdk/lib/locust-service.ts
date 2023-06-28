@@ -1,9 +1,9 @@
-import { locustImage } from './docker-images';
-
 import * as cdk from 'aws-cdk-lib';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
-import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns';
+
+import { locustImage } from './docker-images';
+import { allPorts } from './allPorts';
 
 
 export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster) : ecs.FargateService {
@@ -19,7 +19,7 @@ export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster) : ec
     command: ['-f', '/locust/locustfile.py', '--worker', '--master-host', 'locust.local'],
     environment: {
       'LOGGER_LEVEL': 'DEBUG',
-      'INFLUXDB_PATH': 'http://influxdb.local:8086',
+      'RELAY_URL': 'http://echo.local:8080',
     },
     logging: new ecs.AwsLogDriver({ streamPrefix: 'locust-worker' }),  // Optional
   });
@@ -32,7 +32,7 @@ export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster) : ec
 
   locustMasterTaskDefinition.addContainer('LocustMasterContainer', {
     image: locustImage,
-    command: ['-f', '/locust/locustfile.py', '--master', '--host', 'http://web.local:8000'],
+    command: ['-f', '/locust/locustfile.py', '--master', '--host', 'http://webtest.local:8000'],
     environment: {
       'LOGGER_LEVEL': 'DEBUG',
       'INFLUXDB_PATH': 'http://influxdb.local:8086',
@@ -62,16 +62,7 @@ export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster) : ec
     listenerPort: 8089,
   });
   
-  const allPorts = new ec2.Port({
-    protocol: ec2.Protocol.TCP,
-    fromPort: 0,
-    toPort: 65535,
-    stringRepresentation: 'All'
-  })
-
   locustMaterService.service.connections.allowFromAnyIpv4(allPorts);
-
-  locustWorkerService.node.addDependency(locustMaterService.service);
 
   return locustWorkerService;
 }

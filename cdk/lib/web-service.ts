@@ -1,9 +1,9 @@
-import { webImage, proxyImage } from './docker-images';
-
 import * as cdk from 'aws-cdk-lib';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
-import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns';
+
+import { webImage, proxyImage } from './docker-images';
+import { allPorts } from './allPorts';
 
 
 export function createWebService(stack: cdk.Stack, cluster: ecs.Cluster) : ecs.FargateService {
@@ -24,7 +24,7 @@ export function createWebService(stack: cdk.Stack, cluster: ecs.Cluster) : ecs.F
     portMappings: [{ containerPort: 8080 }],
     logging: new ecs.AwsLogDriver({ streamPrefix: 'web' }),  // Optional
     environment: {
-      'WORKERS': '4',
+      'WORKERS': '5',
     },
   });
 
@@ -39,13 +39,6 @@ export function createWebService(stack: cdk.Stack, cluster: ecs.Cluster) : ecs.F
     publicLoadBalancer: true,
     listenerPort: 80,
   });
-
-  const allPorts = new ec2.Port({
-    protocol: ec2.Protocol.TCP,
-    fromPort: 0,
-    toPort: 65535,
-    stringRepresentation: 'All'
-  })
 
   webService.service.connections.allowFromAnyIpv4(allPorts);
 

@@ -9,6 +9,7 @@ from locust.runners import MasterRunner, WorkerRunner
 from urllib3 import PoolManager
 from time import sleep
 
+relay_url: str
 
 class WebsiteUser(FastHttpUser):
     wait_time = constant(0)
@@ -32,14 +33,14 @@ class WebsiteUser(FastHttpUser):
 
     @task
     def relay(self):
-        self.client.get("/relay?target=http://echo.local:8080/waitrnd?ms=200"
+        self.client.get(f"/relay?target={relay_url}"
             ,timeout=5
             ,headers={'Connection':'close'}
         )
 
     #@task
     def batch_relay(self):
-        self.client.get("/batch_relay?batch=10&target=http://echo.local:8080/waitrnd?ms=200"
+        self.client.get(f"/batch_relay?batch=10&target={relay_url}"
             ,timeout=5
             ,headers={'Connection':'close'}
         )
@@ -51,13 +52,7 @@ from influxdb_client import Point
 from influxdb_client.client.influxdb_client import InfluxDBClient
 from influxdb_client.client.write_api import WriteApi
 
-influxdb_options = {
-    "url":     os.environ.get("INFLUXDB_PATH", "http://localhost:8086"),
-    "token":   os.environ.get("INFLUXDB_TOKEN", "secret-token"),
-    "org":     os.environ.get("INFLUXDB_ORG", "InfluxData"),
-    "bucket":  os.environ.get("INFLUXDB_BUCKET", "webtest"),
-}
-
+influxdb_options: dict
 write_api: WriteApi
 
 latency = []
@@ -65,11 +60,21 @@ latency = []
 
 @events.init.add_listener
 def on_init(environment, **_kwargs):
+    global relay_url
+    global influxdb_options
     global write_api
 
     logging.getLogger().setLevel(level=os.getenv('LOGGER_LEVEL', 'INFO').upper())
+    relay_url = os.environ.get("RELAY_URL", "http://echo:8080/waitrnd?ms=200")
 
     if isinstance(environment.runner, MasterRunner):
+        influxdb_options = {
+            "url":     os.environ.get("INFLUXDB_PATH", "http://localhost:8086"),
+            "token":   os.environ.get("INFLUXDB_TOKEN", "secret-token"),
+            "org":     os.environ.get("INFLUXDB_ORG", "InfluxData"),
+            "bucket":  os.environ.get("INFLUXDB_BUCKET", "webtest"),
+        }
+
         logging.debug(f'init params =\n {json.dumps(influxdb_options, indent=2)}')
         logging.info("connecting to InfluxDB")
         while True:

@@ -1,7 +1,8 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
-import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns';
+
+import { allPorts } from './allPorts';
 
 
 export function createInfluxdbService(stack: cdk.Stack, cluster: ecs.Cluster) : ecs.FargateService {
@@ -28,13 +29,6 @@ export function createInfluxdbService(stack: cdk.Stack, cluster: ecs.Cluster) : 
     publicLoadBalancer: true,
     listenerPort: 8086,
   });
-
-  const allPorts = new ec2.Port({
-    protocol: ec2.Protocol.TCP,
-    fromPort: 0,
-    toPort: 65535,
-    stringRepresentation: 'All'
-  })
 
   influxdbService.service.connections.allowFromAnyIpv4(allPorts);
 
