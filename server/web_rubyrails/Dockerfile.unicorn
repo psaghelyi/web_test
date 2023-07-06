@@ -2,8 +2,6 @@ FROM rails_base
 
 RUN gem install unicorn
 
-ADD application_controller.rb app/controllers/
-ADD routes.rb config/
 ADD unicorn.rb config/
 
 ADD Gemfile .

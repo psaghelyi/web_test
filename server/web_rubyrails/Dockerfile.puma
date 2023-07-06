@@ -2,8 +2,6 @@ FROM rails_base
 
 RUN gem install puma
 
-ADD application_controller.rb app/controllers/
-ADD routes.rb config/
 ADD puma.rb config/
 
 ADD Gemfile .

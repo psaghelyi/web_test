@@ -46,3 +46,6 @@ group :development do
   # gem "spring"
 end
 
+
+gem "opentelemetry-sdk", "~> 1.2"
+gem "opentelemetry-instrumentation-all", "~> 0.39.1"

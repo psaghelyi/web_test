@@ -51,7 +51,7 @@ services:
     container_name: nginx-exporter
     restart: unless-stopped
     command:
-      - '-nginx.scrape-uri=http://host.docker.internal:8080/stub_status'
+      - '-nginx.scrape-uri=http://host.docker.internal:8000/stub_status'
     expose:
       - 9113
     extra_hosts:

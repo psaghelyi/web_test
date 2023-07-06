@@ -8,6 +8,10 @@ WORKDIR /myapp
 
 RUN rake db:create
 
+ADD application_controller.rb app/controllers/
+ADD routes.rb config/
+ADD opentelemetry.rb config/initializers/
+
 EXPOSE 8080
 
 CMD ["rails", "server", "-b", "0.0.0.0", "-p", "8080"]
