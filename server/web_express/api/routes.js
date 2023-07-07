@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import axios from 'axios';
 
+const parseInteger = require('./parse_integer.js');
+
 let router = Router();
 
 router.get("/", (req, res) => {
@@ -9,21 +11,22 @@ router.get("/", (req, res) => {
 
 router.get('/wait', async (req, res) => {
   try {
-    const ms = req.query.ms
+    const ms = parseInt(req.query.ms) || 200;
     setTimeout(function() {
-      res.status(200).send(ms);
-    }, parseInt(ms));    
+      res.status(200).send(ms.toString());
+    }, ms);
   } catch (e) {
     res.sendStatus(500);
   }
 });
 
 router.get("/relay", (req, res) => {
-  var start = process.hrtime();
-  axios.get("http://echo:8080/wait?ms=" + req.query.ms)
+  var target = req.query.target || "http://echo:8080";
+  const start = Date.now();
+  axios.get(target)
     .then(function(response) {
-      var elapsed = process.hrtime(start)[1] / 1000000;
-      res.status(200).json(Math.round(elapsed))
+      const elapsed = Date.now() - start;
+      res.status(200).send(elapsed.toString())
     }).catch(function(error) {
       res.sendStatus(500);
     })

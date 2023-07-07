@@ -1,10 +1,8 @@
-FROM node:latest
-WORKDIR /usr/src/app
-COPY package*.json ./
-RUN yarn
-COPY . .
+FROM node:14
+WORKDIR /app
+COPY package.json yarn.lock /app/
+RUN yarn install --frozen-lockfile
+COPY . /app/
 EXPOSE 8080
 
-ENV WORKERS=2
-
-ENTRYPOINT ["/bin/bash", "-c", "yarn start -i $WORKERS"]
+ENTRYPOINT ["/bin/bash", "-c", "yarn start -i ${WORKERS:=2}"]

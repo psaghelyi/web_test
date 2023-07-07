@@ -8,7 +8,7 @@
     "start": "cross-env NODE_ENV=prod pm2-runtime index.js"
   },
   "devDependencies": {
-    "loadtest": "^4.2.0",
+    "loadtest": "^5.2.0",
     "nodemon": "^2.0.20"
   },
   "dependencies": {
