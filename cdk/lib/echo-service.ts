@@ -16,7 +16,7 @@ export function createEchoService(stack: cdk.Stack, cluster: ecs.Cluster) : ecs.
   echoTaskDefinition.addContainer('EchoContainer', {
     image: echoImage,
     portMappings: [{ containerPort: 8080 }],
-    logging: new ecs.AwsLogDriver({ streamPrefix: 'echo' }),  // Optional
+    logging: new ecs.AwsLogDriver({ streamPrefix: 'echo', mode: ecs.AwsLogDriverMode.NON_BLOCKING }),  // Optional
     //healthCheck: {
     //  command: [
     //    'CMD-SHELL',
@@ -35,7 +35,6 @@ export function createEchoService(stack: cdk.Stack, cluster: ecs.Cluster) : ecs.
     desiredCount: 3,
     cloudMapOptions: {
       name: 'echo',
-      containerPort: 8080,
     },
     publicLoadBalancer: true,
     listenerPort: 8080,

@@ -43,9 +43,9 @@ func main() {
 	})
 
 	router.GET("/relay", func(c *gin.Context) {
-		param_ms := c.DefaultQuery("ms", "0")
+		param_target := c.DefaultQuery("target", "http://echo:8080")
 		start := time.Now()
-		_, err := http.Get("http://echo:8080/wait?ms=" + param_ms)
+		_, err := http.Get(param_target)
 		elapsed := time.Since(start)
 
 		if err != nil {

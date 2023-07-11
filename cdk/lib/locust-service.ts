@@ -21,7 +21,7 @@ export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster) : ec
       'LOGGER_LEVEL': 'DEBUG',
       'RELAY_URL': 'http://echo.local:8080',
     },
-    logging: new ecs.AwsLogDriver({ streamPrefix: 'locust-worker' }),  // Optional
+    logging: new ecs.AwsLogDriver({ streamPrefix: 'locust-worker', mode: ecs.AwsLogDriverMode.NON_BLOCKING }),  // Optional
   });
 
 
@@ -32,13 +32,13 @@ export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster) : ec
 
   locustMasterTaskDefinition.addContainer('LocustMasterContainer', {
     image: locustImage,
-    command: ['-f', '/locust/locustfile.py', '--master', '--host', 'http://webtest.local:8000'],
+    command: ['-f', '/locust/locustfile.py', '--master', '--host', 'http://web.local:8000'],
     environment: {
       'LOGGER_LEVEL': 'DEBUG',
       'INFLUXDB_PATH': 'http://influxdb.local:8086',
     },
     portMappings: [{ containerPort: 8089 }],
-    logging: new ecs.AwsLogDriver({ streamPrefix: 'locust-master' }),  // Optional
+    logging: new ecs.AwsLogDriver({ streamPrefix: 'locust-master', mode: ecs.AwsLogDriverMode.NON_BLOCKING }),  // Optional
   });
 
 
@@ -46,7 +46,7 @@ export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster) : ec
   const locustWorkerService = new ecs.FargateService(stack, 'LocustWorkerService', {
     cluster,
     taskDefinition: locustWorkerTaskDefinition,
-    desiredCount: 4,
+    desiredCount: 3,
   });
 
   // locust master should be available from outside using http
@@ -56,7 +56,6 @@ export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster) : ec
     desiredCount: 1,
     cloudMapOptions: {
       name: 'locust',
-      containerPort: 8089,
     },
     publicLoadBalancer: true,
     listenerPort: 8089,

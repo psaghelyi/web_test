@@ -1,14 +1,9 @@
 # Welcome to your CDK TypeScript project
 
-This is a blank project for CDK development with TypeScript.
+Attaching to a running task in AWS:
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+`aws ecs execute-command --cluster <cluster-name> --task <task-id> --container <container-name> --command "/bin/bash" --interactive --container WebContainer`
 
-## Useful commands
+e.g.:
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `cdk deploy`      deploy this stack to your default AWS account/region
-* `cdk diff`        compare deployed stack with current state
-* `cdk synth`       emits the synthesized CloudFormation template
+`aws ecs execute-command --cluster WebTestCluster1-WebtestClusterE2CD5C12-stR5J6j6asXC --task 6c938a3e9fce4e37a9f85b5f51fb5a9e --command "/bin/bash" --interactive --container WebContainer`

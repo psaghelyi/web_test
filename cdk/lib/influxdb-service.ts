@@ -14,7 +14,7 @@ export function createInfluxdbService(stack: cdk.Stack, cluster: ecs.Cluster) : 
 
   influxdbTaskDefinition.addContainer('InfluxdbContainer', {
     image: ecs.ContainerImage.fromRegistry('influxdb:latest'),
-    logging: new ecs.AwsLogDriver({ streamPrefix: 'InfluxDb' }),  // Optional
+    logging: new ecs.AwsLogDriver({ streamPrefix: 'InfluxDb', mode: ecs.AwsLogDriverMode.NON_BLOCKING }),  // Optional
     portMappings: [{ containerPort: 8086 }],
   });
 
@@ -24,7 +24,6 @@ export function createInfluxdbService(stack: cdk.Stack, cluster: ecs.Cluster) : 
     desiredCount: 1,
     cloudMapOptions: {
       name: 'influxdb',
-      containerPort: 8086,
     },
     publicLoadBalancer: true,
     listenerPort: 8086,

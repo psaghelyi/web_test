@@ -65,7 +65,7 @@ services:
       - web
 
   web:
-    image: "${REGISTRY:-psaghelyi}/web_unicorn"
+    image: "${REGISTRY:-psaghelyi}/web_express"
     restart: unless-stopped
     environment:
       - OTEL_TRACES_EXPORTER=none
