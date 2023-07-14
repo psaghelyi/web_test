@@ -65,10 +65,12 @@ services:
       - web
 
   web:
-    image: "${REGISTRY:-psaghelyi}/web_express"
+    build:
+      context: web_rubyrails
+      dockerfile: Dockerfile.unicorn
     restart: unless-stopped
     environment:
-      - OTEL_TRACES_EXPORTER=none
+      - OTEL_TRACES_EXPORTER=console
       - WORKERS=5
     volumes:
       - sockets:/sockets

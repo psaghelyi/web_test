@@ -49,3 +49,7 @@ end
 
 gem "opentelemetry-sdk", "~> 1.2"
 gem "opentelemetry-instrumentation-all", "~> 0.39.1"
+
+gem "opentelemetry-exporter-otlp", "~> 0.25.0"
+
+gem "opentelemetry-propagator-xray", "~> 0.22.0"
