@@ -1,12 +1,14 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import * as logs from 'aws-cdk-lib/aws-logs';
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns';
 
 import { locustImage } from './docker-images';
 import { allPorts } from './allPorts';
 
 
-export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster) : ecs.FargateService {
+export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster, logGroup: logs.LogGroup) : ecs.FargateService {
 
   // Define the Locust Task Definitions
   const locustWorkerTaskDefinition = new ecs.FargateTaskDefinition(stack, 'LocustWorkerTaskDefinition', {
@@ -14,6 +16,7 @@ export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster) : ec
     cpu: 256,
   });
 
+  
   locustWorkerTaskDefinition.addContainer('LocustWorkerContainer', {
     image: locustImage,
     command: ['-f', '/locust/locustfile.py', '--worker', '--master-host', 'locust.local'],
@@ -21,7 +24,10 @@ export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster) : ec
       'LOGGER_LEVEL': 'DEBUG',
       'RELAY_URL': 'http://echo.local:8080',
     },
-    logging: new ecs.AwsLogDriver({ streamPrefix: 'locust-worker', mode: ecs.AwsLogDriverMode.NON_BLOCKING }),  // Optional
+    logging: new ecs.AwsLogDriver({
+      logGroup: logGroup,
+      streamPrefix: 'locust-worker', 
+      mode: ecs.AwsLogDriverMode.NON_BLOCKING }),
   });
 
 
@@ -38,7 +44,10 @@ export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster) : ec
       'INFLUXDB_PATH': 'http://influxdb.local:8086',
     },
     portMappings: [{ containerPort: 8089 }],
-    logging: new ecs.AwsLogDriver({ streamPrefix: 'locust-master', mode: ecs.AwsLogDriverMode.NON_BLOCKING }),  // Optional
+    logging: new ecs.AwsLogDriver({
+      logGroup: logGroup,
+      streamPrefix: 'locust-master', 
+      mode: ecs.AwsLogDriverMode.NON_BLOCKING }),
   });
 
 

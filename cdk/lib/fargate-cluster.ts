@@ -23,8 +23,8 @@ export class FargateClusterStack extends cdk.Stack {
     const cluster = new ecs.Cluster(this, 'WebtestCluster', {
       vpc,
       containerInsights: true,
+      defaultCloudMapNamespace: { name: 'local' }
     });
-    cluster.addDefaultCloudMapNamespace({ name: 'local' });
 
     // Create log group with retention
     const logGroup = new logs.LogGroup(this, 'WebTestLogGroup', {
@@ -34,10 +34,10 @@ export class FargateClusterStack extends cdk.Stack {
     });
   
     // Create services
-    const echoService = createEchoService(this, cluster);
+    const echoService = createEchoService(this, cluster, logGroup);
     const webService = createWebService(this, cluster, logGroup);
-    const influxdbService = createInfluxdbService(this, cluster);
-    const locustService = createLocustService(this, cluster);
+    const influxdbService = createInfluxdbService(this, cluster, logGroup);
+    const locustService = createLocustService(this, cluster, logGroup);
 
     // Set service creation order
     webService.node.addDependency(echoService);

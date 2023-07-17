@@ -22,7 +22,9 @@ RUN wget -O cmake.tar.gz https://github.com/Kitware/CMake/releases/download/v3.2
     cd /usr/src/cmake && \
     ./bootstrap && \
     make -j "$(nproc)" && \
-    make install
+    make install && \
+    cd / && \
+    rm -r /usr/src/cmake
 
 # Compile ruby
 RUN wget -O ruby.tar.xz "https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR%-rc}/ruby-$RUBY_VERSION.tar.xz" && \

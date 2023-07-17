@@ -1,12 +1,12 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
+import * as logs from 'aws-cdk-lib/aws-logs';
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns';
 
 import { echoImage } from './docker-images';
 import { allPorts } from './allPorts';
 
-
-export function createEchoService(stack: cdk.Stack, cluster: ecs.Cluster) : ecs.FargateService {
+export function createEchoService(stack: cdk.Stack, cluster: ecs.Cluster, logGroup: logs.LogGroup) : ecs.FargateService {
 
   const echoTaskDefinition = new ecs.FargateTaskDefinition(stack, 'EchoTaskDefinition', {
     memoryLimitMiB: 512,
@@ -16,7 +16,10 @@ export function createEchoService(stack: cdk.Stack, cluster: ecs.Cluster) : ecs.
   echoTaskDefinition.addContainer('EchoContainer', {
     image: echoImage,
     portMappings: [{ containerPort: 8080 }],
-    logging: new ecs.AwsLogDriver({ streamPrefix: 'echo', mode: ecs.AwsLogDriverMode.NON_BLOCKING }),  // Optional
+    logging: new ecs.AwsLogDriver({
+      logGroup: logGroup,
+      streamPrefix: 'echo', 
+      mode: ecs.AwsLogDriverMode.NON_BLOCKING }),
     //healthCheck: {
     //  command: [
     //    'CMD-SHELL',
