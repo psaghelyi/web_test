@@ -33,6 +33,7 @@ export function createWebService(stack: cdk.Stack, cluster: ecs.Cluster, logGrou
       mode: ecs.AwsLogDriverMode.NON_BLOCKING }),
     environment: {
       'WORKERS': '5',
+      'OTEL_SERVICE_NAME': 'web-service',
     },
   });
 
@@ -50,7 +51,8 @@ export function createWebService(stack: cdk.Stack, cluster: ecs.Cluster, logGrou
   });
   
 
-  const webService = new ecs_patterns.NetworkLoadBalancedFargateService(stack, 'WebService', {
+  // Rquests going through through ALB can get xray id in headers
+  const webService = new ecs_patterns.ApplicationLoadBalancedFargateService(stack, 'WebService', {
     cluster,
     taskDefinition: webTaskDefinition,
     desiredCount: 3,

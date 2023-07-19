@@ -5,21 +5,26 @@ import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns';
 
 import { echoImage } from './docker-images';
 import { allPorts } from './allPorts';
+import { FargateWithOtelCollectorTaskDefinition } from './fargate-with-otel-collector-task-definition';
 
 export function createEchoService(stack: cdk.Stack, cluster: ecs.Cluster, logGroup: logs.LogGroup) : ecs.FargateService {
 
-  const echoTaskDefinition = new ecs.FargateTaskDefinition(stack, 'EchoTaskDefinition', {
+  const echoTaskDefinition = new FargateWithOtelCollectorTaskDefinition(stack, 'EchoTaskDefinition', {
     memoryLimitMiB: 512,
     cpu: 256,
   });
 
-  echoTaskDefinition.addContainer('EchoContainer', {
+  const containerEcho = echoTaskDefinition.addContainer('EchoContainer', {
     image: echoImage,
     portMappings: [{ containerPort: 8080 }],
     logging: new ecs.AwsLogDriver({
       logGroup: logGroup,
       streamPrefix: 'echo', 
       mode: ecs.AwsLogDriverMode.NON_BLOCKING }),
+    environment: {
+      'WORKERS': '5',
+      'OTEL_SERVICE_NAME': 'echo-service',
+    },
     //healthCheck: {
     //  command: [
     //    'CMD-SHELL',
@@ -30,6 +35,14 @@ export function createEchoService(stack: cdk.Stack, cluster: ecs.Cluster, logGro
     //  startPeriod: cdk.Duration.seconds(60),
     //  retries: 3,
     //},
+  });
+
+  const containerOtelCollector = echoTaskDefinition.addOtelCollectorContainer(logGroup);
+
+  // Start the OTEL collector before the others
+  containerEcho.addContainerDependencies({
+    container: containerOtelCollector,
+    condition: ecs.ContainerDependencyCondition.START,
   });
 
   const echoService = new ecs_patterns.NetworkLoadBalancedFargateService(stack, 'EchoService', {

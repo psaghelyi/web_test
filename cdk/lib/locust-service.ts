@@ -22,7 +22,7 @@ export function createLocustService(stack: cdk.Stack, cluster: ecs.Cluster, logG
     command: ['-f', '/locust/locustfile.py', '--worker', '--master-host', 'locust.local'],
     environment: {
       'LOGGER_LEVEL': 'DEBUG',
-      'RELAY_URL': 'http://echo.local:8080',
+      'RELAY_URL': 'http://echo.local:8080/waitrnd?ms=200',
     },
     logging: new ecs.AwsLogDriver({
       logGroup: logGroup,

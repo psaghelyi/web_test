@@ -2,6 +2,10 @@ import express from 'express';
 import http from 'http';
 import { registerRoutes } from '~/api/routes';
 
+const sdk = require("./nodeSDK");
+
+
+
 const configureExpress = () => {
   let app = express();
   registerRoutes(app);
@@ -21,4 +25,8 @@ const start = () => {
   configureHttpServer(app);
 };
 
-start();
+sdk.nodeSDKBuilder()
+    .then(() => {
+      start();
+    });
+

@@ -3,6 +3,7 @@ registry=$${REGISTRY:=psaghelyi}
 all: build push
 
 build:
+	yarn install
 	docker build -t $(registry)/web_express .
 
 push:
