@@ -66,7 +66,7 @@ def on_init(environment, **_kwargs):
     global write_api
 
     logging.getLogger().setLevel(level=os.getenv('LOGGER_LEVEL', 'INFO').upper())
-    relay_url = parse.quote(os.environ.get("RELAY_URL", "http://echo:8080/waitrnd?ms=200"))
+    relay_url = os.environ.get("RELAY_URL", parse.quote("http://echo:8080/waitrnd?ms=200"))
 
     if isinstance(environment.runner, MasterRunner):
         influxdb_options = {

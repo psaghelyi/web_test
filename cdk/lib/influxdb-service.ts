@@ -3,7 +3,7 @@ import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns';
 
-import { allPorts } from './allPorts';
+import { allPorts } from './all-ports';
 
 
 export function createInfluxdbService(stack: cdk.Stack, cluster: ecs.Cluster, logGroup: logs.LogGroup): ecs.FargateService {

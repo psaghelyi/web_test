@@ -4,7 +4,7 @@ import * as logs from 'aws-cdk-lib/aws-logs';
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns';
 
 import { webImage, proxyImage } from './docker-images';
-import { allPorts } from './allPorts';
+import { allPorts } from './all-ports';
 import { FargateWithOtelCollectorTaskDefinition } from './fargate-with-otel-collector-task-definition';
 
 export function createWebService(stack: cdk.Stack, cluster: ecs.Cluster, logGroup: logs.LogGroup) : ecs.FargateService {
