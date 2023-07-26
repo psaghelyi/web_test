@@ -1,9 +1,8 @@
-import express from 'express';
-import http from 'http';
-import { registerRoutes } from '~/api/routes';
+'use strict'
 
-const sdk = require("./nodeSDK");
-
+const express = require('express');
+const http = require('http');
+const registerRoutes = require('./api/routes');
 
 
 const configureExpress = () => {
@@ -25,8 +24,6 @@ const start = () => {
   configureHttpServer(app);
 };
 
-sdk.nodeSDKBuilder()
-    .then(() => {
-      start();
-    });
+
+start();
 

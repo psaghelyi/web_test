@@ -7,4 +7,4 @@ COPY . /app/
 EXPOSE 8080
 EXPOSE 22
 
-ENTRYPOINT ["/bin/bash", "-c", "yarn start -i ${WORKERS:=2}"]
+ENTRYPOINT ["/bin/bash", "-c", "yarn start-pm2 -i ${WORKERS:=2}"]

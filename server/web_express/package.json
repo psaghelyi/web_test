@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "cross-env NODE_ENV=dev nodemon -e js index.js --watch .",
-    "start": "cross-env NODE_ENV=prod pm2-runtime index.js"
+    "start": "cross-env NODE_ENV=prod node --require ./instrumentation.js index.js",
+    "start-pm2": "cross-env NODE_ENV=prod pm2-runtime index.js"
   },
   "devDependencies": {
     "loadtest": "^5.2.0",
@@ -18,6 +19,7 @@
     "@babel/register": "^7.22.5",
     "@opentelemetry/api": "^1.4.1",
     "@opentelemetry/api-metrics": "^0.33.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.38.0",
     "@opentelemetry/exporter-metrics-otlp-grpc": "^0.41.0",
     "@opentelemetry/exporter-trace-otlp-grpc": "^0.41.0",
     "@opentelemetry/id-generator-aws-xray": "^1.2.0",
