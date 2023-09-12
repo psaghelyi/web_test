@@ -4,9 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "cross-env NODE_ENV=dev nodemon -e js index.js --watch .",
-    "start": "cross-env NODE_ENV=prod node --require ./instrumentation.js index.js",
-    "start-pm2": "cross-env NODE_ENV=prod pm2-runtime index.js"
+    "dev": "nodemon -e js index.js --watch .",
+    "start": "cross-env NODE_ENV=production node index.js",
+    "start-pm2": "cross-env NODE_ENV=production pm2-runtime index.js"
   },
   "devDependencies": {
     "loadtest": "^5.2.0",

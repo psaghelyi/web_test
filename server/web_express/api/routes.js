@@ -1,5 +1,5 @@
 const { Router } = require ('express');
-const { tracer, getTraceIdJson } = require ('./instrument-request');
+const { logToActiveSpan } = require ('./otel-helpers');
 const { httpClient } = require ('./http-client');
 
 const { NetTransportValues, SemanticAttributes } = require('@opentelemetry/semantic-conventions');
@@ -47,6 +47,12 @@ router.get("/relay", async (req, res) => {
       }
     }
     const elapsed = Date.now() - start;
+
+    logToActiveSpan('Child calls being happened', {
+      'webtest.target': target,
+      'webtest.duration': elapsed,
+    });
+
     res.status(200).send(elapsed.toString())
   } catch (error) {
     res.sendStatus(500);

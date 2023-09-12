@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { tracer, getTraceIdJson } = require('./instrument-request');
+const { tracer, getTraceIdJson } = require('./otel-helpers');
 const { trace, context, SpanKind, SpanStatusCode } = require('@opentelemetry/api');
 const { NetTransportValues, SemanticAttributes } = require('@opentelemetry/semantic-conventions');
 

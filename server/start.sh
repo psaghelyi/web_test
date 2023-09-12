@@ -1,9 +1,12 @@
 #!/bin/bash
 
-cd ../monitoring; docker compose up -d; cd ../server
+aws-vault exec --no-session default -- \
+docker compose up \
+    --scale echo=4 \
+    --scale web=4 \
+    --scale locust=4 \
+    --build \
+    --remove-orphans \
+    --detach
 
-docker compose up --scale web=4 --scale locust=4 --build --remove-orphans -d
 
-locust -f ./locust/locustfile.py --master
-
-docker compose down
