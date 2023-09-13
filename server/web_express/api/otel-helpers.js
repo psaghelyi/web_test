@@ -8,12 +8,11 @@ function getCurrentSpan() {
   return api.trace.getSpan(api.context.active());
 }
 
-function getTraceIdJson(span) {
+function getXrayTraceId(span) {
   const otelTraceId = span.spanContext().traceId;
   const timestamp = otelTraceId.substring(0, 8);
   const randomNumber = otelTraceId.substring(8);
-  const xrayTraceId = `1-${timestamp}-${randomNumber}`;
-  return JSON.stringify({ "xrayTraceId": xrayTraceId });
+  return `1-${timestamp}-${randomNumber}`;
 }
 
 function logToActiveSpan(message, attributes) {
@@ -34,10 +33,21 @@ function logToActiveSpan(message, attributes) {
   }
 }
 
+function addTraceIdToRequest(app) {
+  app.use((req, res, next) => {
+    const span = getCurrentSpan();
+    if (span) {
+      req.traceId = getXrayTraceId(span);
+    }
+    next();
+  });
+}
+
 
 module.exports = {
   tracer,
   getCurrentSpan,
-  getTraceIdJson,
-  logToActiveSpan
+  getXrayTraceId,
+  logToActiveSpan,
+  addTraceIdToRequest,
 }

@@ -10,10 +10,9 @@ const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc')
 const { ConsoleSpanExporter } = require('@opentelemetry/sdk-trace-node');
 const { AWSXRayPropagator } = require("@opentelemetry/propagator-aws-xray");
 const { AWSXRayIdGenerator } = require("@opentelemetry/id-generator-aws-xray");
-const { ParentBasedSampler, TraceIdRatioBasedSampler } = require('@opentelemetry/sdk-trace-base')
+const { TraceIdRatioBasedSampler } = require('@opentelemetry/sdk-trace-node')
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
 const { ExpressLayerType } = require('@opentelemetry/instrumentation-express');
-const { AwsInstrumentation } = require('@opentelemetry/instrumentation-aws-sdk');
 
 
 const _resource = Resource.default().merge(new Resource({
@@ -22,6 +21,7 @@ const _resource = Resource.default().merge(new Resource({
 
 //const _traceExporter = new ConsoleSpanExporter();
 const _traceExporter = new OTLPTraceExporter();
+//const _traceExporter: new OTLPTraceExporter({url: 'grpc://otel-collector:4317'}),
 
 const _spanProcessor = new BatchSpanProcessor(_traceExporter);
 
@@ -29,16 +29,14 @@ const _tracerConfig = {
   idGenerator: new AWSXRayIdGenerator(),
 }
 
+const _sampler = new TraceIdRatioBasedSampler(0.2); //set at 20% sampling rate
+
 const _metricReader = new PeriodicExportingMetricReader({
   //exporter: new ConsoleMetricExporter(),
   exporter: new OTLPMetricExporter(),
   exportIntervalMillis: 1000
 });
 
-const _sampler = new ParentBasedSampler({
-  //set at 20% sampling rate
-  root: new TraceIdRatioBasedSampler(0.2),
-});
 
 const sdk = new opentelemetry.NodeSDK({
   textMapPropagator: new AWSXRayPropagator(),
@@ -74,6 +72,7 @@ sdk.configureTracerProvider(_tracerConfig, _spanProcessor);
 
 // this enables the API to record telemetry
 sdk.start();
+console.log('Tracing and Metrics has been started');
 
 // gracefully shut down the SDK on process exit
 process.on('SIGTERM', () => {

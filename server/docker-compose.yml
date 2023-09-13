@@ -24,7 +24,7 @@ services:
     restart: unless-stopped
     environment:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://aws-ot-collector:4317
-      - OTEL_RESOURCE_ATTRIBUTES=service.namespace=NSWebTest,service.name=Web,aws.log.group.names=/ecs/web-test
+      - OTEL_RESOURCE_ATTRIBUTES=service.namespace=NSWebTest,service.name=Web,aws.log.group.names=/local-docker/web-test
       - OTEL_METRICS_EXPORTER=otlp
       - WORKERS=2
     volumes:
@@ -42,7 +42,7 @@ services:
     restart: unless-stopped
     environment:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://aws-ot-collector:4317
-      - OTEL_RESOURCE_ATTRIBUTES=service.namespace=NSWebTest,service.name=Echo,aws.log.group.names=/ecs/web-test
+      - OTEL_RESOURCE_ATTRIBUTES=service.namespace=NSWebTest,service.name=Echo,aws.log.group.names=/local-docker/web-test
       - OTEL_METRICS_EXPORTER=otlp
       - WORKERS=2
     expose:
@@ -58,7 +58,7 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
-      - AWS_EMF_LOG_GROUP_NAME=/ecs/web-test
+      - AWS_EMF_LOG_GROUP_NAME=/local-docker/web-test
     volumes:
       - ./otel-config.yaml:/etc/otel-agent-config.yaml
     ports:
