@@ -1,6 +1,6 @@
 const axios = require('axios');
-const { tracer, getTraceIdJson } = require('./otel-helpers');
-const { trace, context, SpanKind, SpanStatusCode } = require('@opentelemetry/api');
+const { tracer } = require('./otel-helpers');
+const { SpanKind, SpanStatusCode } = require('@opentelemetry/api');
 const { NetTransportValues, SemanticAttributes } = require('@opentelemetry/semantic-conventions');
 
 const httpClient = axios.create();

@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: An example SAM template for Lambda function with API Gateway
+
+Resources:
+  WebLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/index.handler
+      Runtime: nodejs18.x
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
+        WebApi:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: GET
