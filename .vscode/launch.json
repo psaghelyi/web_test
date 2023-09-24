@@ -12,6 +12,22 @@
             "args": [
                 "server"
             ]
+        },
+        {
+            "name": "Attach to SAM CLI",
+            "type": "node",
+            "request": "attach",
+            "address": "localhost",
+            "port": 5858,
+            "localRoot": "${workspaceRoot}/server/web_lambda", // Path to TypeScript source code
+            "remoteRoot": "/var/task", // Path in the Lambda container
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceRoot}/server/web_lambda/dist/**/*.js" // Location of your compiled JavaScript files
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
         }
     ]
 }

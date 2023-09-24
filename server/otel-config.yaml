@@ -1,0 +1,41 @@
+extensions:
+  health_check:
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+processors:
+  batch:
+
+exporters:
+  logging:
+    # Only for development purposes
+    loglevel: debug
+  awsxray:
+    # Converts to Annotations, rather than Metadata 
+    # https://github.com/open-telemetry/opentelemetry-collector-contrib/pull/808
+    indexed_attributes: 
+      - highbond.account.subdomain
+      - highbond.account.id
+      - highbond.user.uid
+  awsemf:
+    log_group_name: '${AWS_EMF_LOG_GROUP_NAME}'
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [awsxray, logging]
+    metrics:
+      receivers: [otlp]
+      exporters: [awsemf]
+  
+  extensions: [health_check]
+  
+  telemetry:
+    logs:
+      level: debug

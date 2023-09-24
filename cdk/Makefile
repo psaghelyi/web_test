@@ -1,2 +1,10 @@
-all:
-	cdk deploy --profile atlantis --dry-run
+all: fargate lambda
+
+fargate:
+	cdk deploy WebTestCluster1
+
+lambda: build
+	cdk deploy WebLambdaStack
+
+build:
+	cd ../server/web_lambda && make

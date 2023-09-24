@@ -2,6 +2,9 @@
 
 *.sqlite*
 
+node_modules
+
+
 .idea
 .venv/*
 
@@ -21,3 +24,4 @@ __pycache__
 test_results
 
 *.bkp
+server/web_lambda/dist/*

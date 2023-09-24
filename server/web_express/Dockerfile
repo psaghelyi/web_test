@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:18
 RUN apt-get update && apt-get install -y openssh-server
 WORKDIR /app
 COPY package.json yarn.lock /app/
@@ -7,4 +7,6 @@ COPY . /app/
 EXPOSE 8080
 EXPOSE 22
 
-ENTRYPOINT ["/bin/bash", "-c", "yarn start-pm2 -i ${WORKERS:=2}"]
+ENTRYPOINT ["/bin/bash", "-c"]
+
+CMD ["yarn start-pm2 -i ${WORKERS:=2}"]

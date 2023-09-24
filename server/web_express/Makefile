@@ -10,4 +10,7 @@ push:
 	docker push $(registry)/web_express
 
 run:
+	docker run -it --rm -p 8080:8080 $(registry)/web_express "yarn start"
+
+run-cluster:
 	docker run -it --rm -p 8080:8080 -e WORKERS=5 $(registry)/web_express

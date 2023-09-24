@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+      "target": "es2017",
+      "module": "commonjs",
+      "strict": true,
+      "pretty": true,
+      "noUnusedLocals": true,
+      "noImplicitReturns": true,
+      "noEmitOnError": true,
+      "noFallthroughCasesInSwitch": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true,
+      "outDir": "./dist"
+    },
+    "include": ["*.ts"],
+    "exclude": ["node_modules"]
+  }
+  
