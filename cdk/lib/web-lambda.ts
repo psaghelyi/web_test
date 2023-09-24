@@ -13,7 +13,7 @@ export class WebLambdaStack extends cdk.Stack {
         const region = cdk.Stack.of(this).region;
         
         // Using the OTEL Collector layer
-        //const otelCollectorLayer = lambda.LayerVersion.fromLayerVersionArn(this, 'OTelCollectorLayer', `arn:aws:lambda:${region}:184161586896:layer:opentelemetry-collector-amd64-0_2_0:1`);
+        const otelCollectorLayer = lambda.LayerVersion.fromLayerVersionArn(this, 'OTelCollectorLayer', `arn:aws:lambda:${region}:184161586896:layer:opentelemetry-collector-amd64-0_2_0:1`);
 
         // Using the OTEL layer
         const otelSdkLayer = lambda.LayerVersion.fromLayerVersionArn(this, 'OTellayer', `arn:aws:lambda:${region}:184161586896:layer:opentelemetry-nodejs-0_2_0:1`);
@@ -26,10 +26,11 @@ export class WebLambdaStack extends cdk.Stack {
             handler: 'dist/index.handler',
             tracing: lambda.Tracing.ACTIVE,
             code: lambda.Code.fromAsset('../server/web_lambda'),
-            layers: [otelSdkLayer],
+            layers: [otelSdkLayer, otelCollectorLayer],
             environment: {
                 AWS_LAMBDA_EXEC_WRAPPER: "/opt/otel-handler",
                 OTEL_LOG_LEVEL: "debug",
+                OPENTELEMETRY_COLLECTOR_CONFIG_FILE: "/var/task/collector.yaml",
             },
             logRetention: logs.RetentionDays.ONE_DAY,
         });
