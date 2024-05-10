@@ -1,12 +1,11 @@
 #!/bin/bash
 
-aws-vault exec --no-session default -- \
+aws-vault exec --no-session atlantis -- \
 docker compose up \
-    --scale echo=4 \
-    --scale web=4 \
-    --scale locust=4 \
-    --build \
+    --scale echo=1 \
+    --scale web=1 \
     --remove-orphans \
+    --build \
     --detach
 
 

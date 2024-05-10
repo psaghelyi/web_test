@@ -1,13 +1,14 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as logs from 'aws-cdk-lib/aws-logs';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns';
 
 import { webImage, proxyImage } from './docker-images';
 import { allPorts } from './all-ports';
 import { FargateWithOtelCollectorTaskDefinition } from './fargate-with-otel-collector-task-definition';
 
-export function createWebService(stack: cdk.Stack, cluster: ecs.Cluster, logGroup: logs.LogGroup) : ecs.FargateService {
+export function createWebService(stack: cdk.Stack, cluster: ecs.Cluster, logGroup: logs.LogGroup, swParam: ssm.StringParameter) : ecs.FargateService {
 
   const webTaskDefinition = new FargateWithOtelCollectorTaskDefinition(stack, 'WebTaskDefinition', {
     memoryLimitMiB: 1024,
@@ -34,22 +35,13 @@ export function createWebService(stack: cdk.Stack, cluster: ecs.Cluster, logGrou
     environment: {
       'WORKERS': '5',
       'OTEL_SERVICE_NAME': 'web-service',
+      'OTEL_RESOURCE_ATTRIBUTES': 'aws.log.group.names=' + logGroup.logGroupName,
     },
   });
 
-  const containerOtelCollector = webTaskDefinition.addOtelCollectorContainer(logGroup);
-
-  // Start the OTEL collector before the others
-  containerWeb.addContainerDependencies({
-    container: containerOtelCollector,
-    condition: ecs.ContainerDependencyCondition.START,
-  });
-
-  containerProxy.addContainerDependencies({
-    container: containerOtelCollector,
-    condition: ecs.ContainerDependencyCondition.START,
-  });
-  
+  //const containerOtelCollector = webTaskDefinition.addOtelCollectorContainer(logGroup);
+  const containerCloudWatchAgent = webTaskDefinition.addCloudWatchAgentContainer(logGroup, swParam);
+  //const containerXRaysidecar = webTaskDefinition.addXRaysidecarContainer(logGroup);
 
   // Rquests going through through ALB can get xray id in headers
   const webService = new ecs_patterns.ApplicationLoadBalancedFargateService(stack, 'WebService', {
