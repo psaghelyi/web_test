@@ -4,9 +4,6 @@ RUN gem install unicorn
 
 ADD unicorn.rb config/
 
-ADD Gemfile .
-RUN bundle install
-
 RUN mkdir -p shared/pids shared/log
 
 CMD ["unicorn", "-c", "config/unicorn.rb", "-E", "production"]

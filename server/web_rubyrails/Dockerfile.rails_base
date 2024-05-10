@@ -8,6 +8,9 @@ WORKDIR /myapp
 
 RUN rake db:create
 
+RUN bundle add opentelemetry-sdk opentelemetry-instrumentation-all opentelemetry-exporter-otlp opentelemetry-propagator-xray
+RUN bundle install
+
 ADD application_controller.rb app/controllers/
 ADD routes.rb config/
 ADD opentelemetry.rb config/initializers/

@@ -1,4 +1,3 @@
-version: '3.8'
 
 volumes:
   sockets: {}
@@ -16,16 +15,21 @@ services:
       - web
 
   web:
-    #image: "${REGISTRY:-psaghelyi}/web_express"
-    build:
-      #context: web_rubyrails
-      #dockerfile: Dockerfile.unicorn
-      context: web_express
+    image: "${REGISTRY:-psaghelyi}/web_unicorn"
+    #build:
+    #  context: web_rubyrails
+    #  dockerfile: Dockerfile.unicorn   
+    platform: linux/amd64
     restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://aws-ot-collector:4317
+    # https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://aws-cloudwatch-agent:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
       - OTEL_RESOURCE_ATTRIBUTES=service.namespace=NSWebTest,service.name=Web,aws.log.group.names=/local-docker/web-test
       - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_TRACES_EXPORTER=otlp
       - WORKERS=2
     volumes:
       - sockets:/sockets
@@ -34,24 +38,34 @@ services:
     depends_on:
       - echo
       - aws-ot-collector
+      - aws-cloudwatch-agent
 
   echo:
-    #image: "${REGISTRY:-psaghelyi}/web_express"
-    build:
-      context: web_express
+    image: "${REGISTRY:-psaghelyi}/web_unicorn"
+    #build:
+    #  context: web_rubyrails
+    #  dockerfile: Dockerfile.unicorn      
+    platform: linux/amd64
     restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://aws-ot-collector:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://aws-cloudwatch-agent:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
       - OTEL_RESOURCE_ATTRIBUTES=service.namespace=NSWebTest,service.name=Echo,aws.log.group.names=/local-docker/web-test
       - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_TRACES_EXPORTER=otlp
       - WORKERS=2
     expose:
       - 8080
     depends_on:
       - aws-ot-collector
+      - aws-cloudwatch-agent
 
   aws-ot-collector:
     image: public.ecr.aws/aws-observability/aws-otel-collector:latest
+    platform: linux/amd64
+    restart: unless-stopped
     command: ["--config=/etc/otel-agent-config.yaml"]
     environment:
       - AWS_REGION=${AWS_REGION}
@@ -61,27 +75,48 @@ services:
       - AWS_EMF_LOG_GROUP_NAME=/local-docker/web-test
     volumes:
       - ./otel-config.yaml:/etc/otel-agent-config.yaml
-    ports:
-      - "13133:13133" # health_check
-  
-  locust:
-    image: "${REGISTRY:-psaghelyi}/locust"
-    command: -f /locust/locustfile.py --worker --master-host locust-master
+    expose:
+      - 4317
+      - 4318
+      - 2000
+    
+  aws-cloudwatch-agent:
+    image: amazon/cloudwatch-agent:latest
+    platform: linux/amd64
     restart: unless-stopped
     environment:
-      - RELAY_URL=http://echo:8080/waitrnd?ms=200
-    extra_hosts:
-      - host.docker.internal:host-gateway
-    depends_on:
-      - locust-master
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
+    volumes:
+      - ./cloud-watch.json:/etc/cwagentconfig/cloud-watch.json
+      - ./.logs/cloudwatch:/var/log
+    command: ["/opt/aws/amazon-cloudwatch-agent/bin/start-amazon-cloudwatch-agent"]
+    expose:
+      - 4317
+      - 4318
+      - 2000
 
-  locust-master:
-    image: "${REGISTRY:-psaghelyi}/locust"
-    command: -f /locust/locustfile.py --master --host http://host.docker.internal:8000
-    restart: unless-stopped
-    environment:
-      - INFLUXDB_PATH=http://host.docker.internal:8086
-    extra_hosts:
-      - host.docker.internal:host-gateway
-    ports:
-      - "8089:8089"
+
+  #locust:
+  #  image: "${REGISTRY:-psaghelyi}/locust"
+  #  command: -f /locust/locustfile.py --worker --master-host locust-master
+  #  restart: unless-stopped
+  #  environment:
+  #    - RELAY_URL=http://echo:8080/waitrnd?ms=200
+  #  extra_hosts:
+  #    - host.docker.internal:host-gateway
+  #  depends_on:
+  #    - locust-master
+
+  #locust-master:
+  #  image: "${REGISTRY:-psaghelyi}/locust"
+  #  command: -f /locust/locustfile.py --master --host http://host.docker.internal:8000
+  #  restart: unless-stopped
+  #  environment:
+  #    - INFLUXDB_PATH=http://host.docker.internal:8086
+  #  extra_hosts:
+  #    - host.docker.internal:host-gateway
+  #  ports:
+  #    - "8089:8089"

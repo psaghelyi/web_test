@@ -3,8 +3,8 @@ all: fargate lambda
 fargate:
 	cdk deploy WebTestCluster1
 
-lambda: build
+lambda: build_lambda
 	cdk deploy WebLambdaStack
 
-build:
+build_lambda:
 	cd ../server/web_lambda && make

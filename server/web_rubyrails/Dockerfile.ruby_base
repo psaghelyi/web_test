@@ -1,33 +1,23 @@
-FROM amazonlinux:2 as ruby_base
+FROM amazonlinux:2023.3.20240117.0 as ruby_base
 
-ENV RUBY_MAJOR 3.0
-ENV RUBY_VERSION 3.0.1
+ENV RUBY_MAJOR 3.1
+ENV RUBY_VERSION 3.1.4
+ENV RUBY_DOWNLOAD_SHA256 1b6d6010e76036c937b9671f4752f065aeca800a6c664f71f6c9a699453af94f
 ENV RUBYGEMS_VERSION 3.3.9
 ENV BUNDLER_VERSION 2.3.6
+
 ENV LANG=C.UTF-8
 
-ARG PG_CLIENT_VERSION=postgresql12
 ARG PG_DEV_LIB=libpq-devel
 
 # Install dependencies
-RUN yum -y update && \
-    yum install -y git ssh procps unzip file wget tar zlib-devel openssl-devel readline-devel shared-mime-info sqlite htop && \
-    yum groupinstall -y 'Development Tools'
-    
-# Compile CMake
-RUN wget -O cmake.tar.gz https://github.com/Kitware/CMake/releases/download/v3.20.0/cmake-3.20.0.tar.gz && \
-    mkdir -p /usr/src/cmake && \
-    tar -zxvf cmake.tar.gz -C /usr/src/cmake --strip-components=1 && \
-    rm cmake.tar.gz && \
-    cd /usr/src/cmake && \
-    ./bootstrap && \
-    make -j "$(nproc)" && \
-    make install && \
-    cd / && \
-    rm -r /usr/src/cmake
+RUN dnf install -y git openssh procps unzip file wget tar zlib-devel openssl-devel readline-devel shared-mime-info libyaml-devel && \
+    dnf groupinstall -y 'Development Tools'
 
-# Compile ruby
+
+# Compile ruby:
 RUN wget -O ruby.tar.xz "https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR%-rc}/ruby-$RUBY_VERSION.tar.xz" && \
+    echo "$RUBY_DOWNLOAD_SHA256 *ruby.tar.xz" | sha256sum -c - && \
     mkdir -p /usr/src/ruby && \
     tar -xJf ruby.tar.xz -C /usr/src/ruby --strip-components=1 && \
     rm ruby.tar.xz && \
@@ -44,13 +34,15 @@ RUN wget -O ruby.tar.xz "https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR%-rc}/
     gem update --system "$RUBYGEMS_VERSION" && \
     gem install bundler --no-user-install --version "$BUNDLER_VERSION" --force && \
     rm -r -f /root/.gem/
-    
+
 #
 # Despite the fact we don't need postgresql client and only need postgresql-devel to build native extensions for gem,
-# we should keep command to install postgresql client here, because this command makes postgresql-devel@9.6 available for us.
-# Without it postgresql-devel@9.2 (and postgresql@9.2 as its dependency) will be installed.
-RUN amazon-linux-extras install -y $PG_CLIENT_VERSION && \
-    yum install -y $PG_DEV_LIB
+    # we should keep command to install postgresql client here, because this command makes postgresql-devel@9.6 available for us.
+    # Without it postgresql-devel@9.2 (and postgresql@9.2 as its dependency) will be installed.
+RUN dnf install -y postgresql15 && \
+    dnf install -y $PG_DEV_LIB && \
+    dnf install -y postgresql15-upgrade postgresql15-upgrade-devel
+
 
 # Use Bash as the default command
 CMD ["/usr/bin/bash"]
