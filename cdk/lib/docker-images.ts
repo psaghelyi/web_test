@@ -1,8 +1,6 @@
 import { ContainerImage } from "aws-cdk-lib/aws-ecs";
 
-
-export const locustImage = ContainerImage.fromRegistry('psaghelyi/locust:latest');
-export const proxyImage = ContainerImage.fromRegistry('psaghelyi/proxy_nginx:latest');
-export const webImage = ContainerImage.fromRegistry('psaghelyi/web_unicorn:latest');
-export const echoImage = ContainerImage.fromRegistry('psaghelyi/web_unicorn:latest');
+export const proxyImage = ContainerImage.fromRegistry('656912352974.dkr.ecr.us-west-2.amazonaws.com/proxy_nginx:latest');
+export const webImage = ContainerImage.fromRegistry('656912352974.dkr.ecr.us-west-2.amazonaws.com/web_unicorn:latest');
+export const echoImage = ContainerImage.fromRegistry('656912352974.dkr.ecr.us-west-2.amazonaws.com/web_unicorn:latest');
 

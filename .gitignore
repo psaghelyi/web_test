@@ -25,3 +25,6 @@ test_results
 
 *.bkp
 server/web_lambda/dist/*
+
+cdk/package-lock.json
+cdk/yarn.lock
