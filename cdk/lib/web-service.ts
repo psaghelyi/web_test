@@ -3,7 +3,7 @@ import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns';
-
+import { addEcsRole } from './add-ecs-role'
 import { webImage, proxyImage } from './docker-images';
 import { allPorts } from './all-ports';
 import { FargateWithOtelCollectorTaskDefinition } from './fargate-with-otel-collector-task-definition';
@@ -13,6 +13,7 @@ export function createWebService(stack: cdk.Stack, cluster: ecs.Cluster, logGrou
   const webTaskDefinition = new FargateWithOtelCollectorTaskDefinition(stack, 'WebTaskDefinition', {
     memoryLimitMiB: 1024,
     cpu: 512,
+    executionRole: addEcsRole(stack, 'addEcsWebRole')
   });
 
   const containerProxy = webTaskDefinition.addContainer('ProxyContainer', {

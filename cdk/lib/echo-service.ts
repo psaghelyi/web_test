@@ -6,6 +6,7 @@ import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns';
 
 import { echoImage } from './docker-images';
 import { allPorts } from './all-ports';
+import { addEcsRole } from './add-ecs-role'
 import { FargateWithOtelCollectorTaskDefinition } from './fargate-with-otel-collector-task-definition';
 
 export function createEchoService(stack: cdk.Stack, cluster: ecs.Cluster, logGroup: logs.LogGroup, swParam: ssm.StringParameter) : ecs.FargateService {
@@ -13,6 +14,7 @@ export function createEchoService(stack: cdk.Stack, cluster: ecs.Cluster, logGro
   const echoTaskDefinition = new FargateWithOtelCollectorTaskDefinition(stack, 'EchoTaskDefinition', {
     memoryLimitMiB: 512,
     cpu: 256,
+    executionRole: addEcsRole(stack, 'addEcsEchoRole')
   });
 
   const containerEcho = echoTaskDefinition.addContainer('EchoContainer', {
