@@ -4,7 +4,4 @@ RUN gem install puma
 
 ADD puma.rb config/
 
-ADD Gemfile .
-RUN bundle install
-
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]

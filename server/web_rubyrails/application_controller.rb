@@ -1,13 +1,25 @@
 require 'net/http'
 require 'thread'
 require 'benchmark'
+require "opentelemetry/sdk"
 
 Rails.application.configure do
     config.after_initialize do
-        stdout_logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
-        stdout_logger.level = Logger::INFO
-        stdout_logger.formatter = Rails.logger.formatter
-        #Rails.logger.extend(ActiveSupport::Logger.broadcast(stdout_logger))
+        Rails.logger = Logger.new(STDOUT)
+
+        
+        Rails.logger.formatter = proc do |severity, time, progname, msg|
+            span_id = OpenTelemetry::Trace.current_span.context.hex_span_id
+            trace_id = OpenTelemetry::Trace.current_span.context.hex_trace_id
+            if defined? OpenTelemetry::Trace.current_span.name
+              operation = OpenTelemetry::Trace.current_span.name
+            else
+              operation = 'undefined'
+            end
+
+            { "time" => time, "level" => severity, "message" => msg, "trace_id" => trace_id, "span_id" => span_id,
+              "operation" => operation }.to_json + "\n"
+          end
     end
 end
 
@@ -18,6 +30,15 @@ class ApplicationController < ActionController::API
     # /
     def index
         render :plain => 'Hello from RoR!'
+
+        current_span = OpenTelemetry::Trace.current_span
+        current_span.add_attributes({
+            "my.cool.attribute" => "a value",
+            "my.first.name" => "Oscar"
+        })
+
+        # log source IP 
+        Rails.logger.info("/ Request from #{request.remote_ip}")
     end
 
     # /wait?ms=1000
@@ -30,6 +51,8 @@ class ApplicationController < ActionController::API
     # /relay?ms=1000
     def relay
         target = params[:target].presence || 'http://echo:8080'
+        # log source IP 
+        Rails.logger.info("/relay Request from #{request.remote_ip}")
         begin
             res = nil
             elapsed = Benchmark.ms {
@@ -37,6 +60,11 @@ class ApplicationController < ActionController::API
             }
             if res.is_a?(Net::HTTPSuccess)
                 render :plain => elapsed.round.to_s, :status => 200
+
+                current_span = OpenTelemetry::Trace.current_span
+                current_span.add_attributes({
+                    "ellapsed time" => elapsed.round.to_s
+                })
             else
                 render :nothing => true, :status => 400
             end
