@@ -3,13 +3,10 @@ import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
-import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from 'constructs';
 
-import { createEchoService } from './echo-service';
-import { createWebService } from './web-service';
-import { createInfluxdbService } from './influxdb-service';
-import { createLocustService } from './locust-service';
+import { createEchoService, createEchoOtelService } from './echo-service';
+import { createWebService, createOtelWebService } from './web-service';
 
 export class FargateClusterStack extends cdk.Stack {
 
@@ -21,6 +18,11 @@ export class FargateClusterStack extends cdk.Stack {
       maxAzs: 3 // Default is all AZs in region
     });
 
+    // Create a VPC for the OtelFargate cluster
+    const otelVpc = new ec2.Vpc(this, 'OtelWebtestVpc', {
+      maxAzs: 3 // Default is all AZs in region
+    });
+
     // Create a new ECS cluster
     const cluster = new ecs.Cluster(this, 'WebtestCluster', {
       vpc,
@@ -28,9 +30,22 @@ export class FargateClusterStack extends cdk.Stack {
       defaultCloudMapNamespace: { name: 'local' }
     });
 
+    const otelCluster = new ecs.Cluster(this, 'WebtestOtelCluster', {
+      vpc: otelVpc,
+      containerInsights: true,
+      defaultCloudMapNamespace: { name: 'local' }
+    });
+
     // Create log group with retention
     const logGroup = new logs.LogGroup(this, 'WebTestLogGroup', {
       logGroupName: '/ecs/web-test',
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      retention: logs.RetentionDays.ONE_DAY,
+    });
+
+    // Create log group with retention
+    const logGroupOtel = new logs.LogGroup(this, 'WebTestOtelLogGroup', {
+      logGroupName: '/ecs/web-test-otel',
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       retention: logs.RetentionDays.ONE_DAY,
     });
@@ -73,7 +88,10 @@ export class FargateClusterStack extends cdk.Stack {
   
     // Create services
     const echoService = createEchoService(this, cluster, logGroup, cwParam);
+    const echoOtelService = createEchoOtelService(this, otelCluster, logGroupOtel, cwParam);
     const webService = createWebService(this, cluster, logGroup, cwParam);
+    const webOtelService = createOtelWebService(this, otelCluster, logGroupOtel, cwParam);
+
     //const influxdbService = createInfluxdbService(this, cluster, logGroup);
     //const locustService = createLocustService(this, cluster, logGroup);
 

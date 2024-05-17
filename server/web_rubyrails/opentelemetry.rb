@@ -4,7 +4,7 @@ require 'opentelemetry/instrumentation/all'
 require 'opentelemetry/propagator/xray'
 
 OpenTelemetry::SDK.configure do |c|
-  c.service_name = 'web-ruby'
+  c.service_name = 'web-rubyrails-otel'
 
   c.id_generator = OpenTelemetry::Propagator::XRay::IDGenerator
   c.propagators = [OpenTelemetry::Propagator::XRay::TextMapPropagator.new]

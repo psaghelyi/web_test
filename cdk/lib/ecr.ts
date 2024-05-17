@@ -10,8 +10,16 @@ export class Ecr extends cdk.Stack {
             repositoryName: "web_unicorn"
         });
 
+        const unicornOtelRepository = new ecr.Repository(this, "web_unicorn_otel", {
+            repositoryName: "web_unicorn_otel"
+        });
+
         const pumaRepository = new ecr.Repository(this, "web_puma", {
             repositoryName: "web_puma"
+        });
+
+        const pumaOtelRepository = new ecr.Repository(this, "web_puma_otel", {
+            repositoryName: "web_puma_otel"
         });
 
         const proxyRepository = new ecr.Repository(this, "proxy_nginx", {

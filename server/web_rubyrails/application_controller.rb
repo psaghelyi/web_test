@@ -1,41 +1,50 @@
 require 'net/http'
 require 'thread'
 require 'benchmark'
-require "opentelemetry/sdk"
+require 'active_support'
+require 'aws-xray-sdk/facets/rails/railtie'
+require 'aws-xray-sdk'
 
 Rails.application.configure do
     config.after_initialize do
+
+        XRay.recorder.begin_segment 'my_service'
         Rails.logger = Logger.new(STDOUT)
+        config.logger = ActiveSupport::Logger.new(STDOUT)
 
-        
-        Rails.logger.formatter = proc do |severity, time, progname, msg|
-            span_id = OpenTelemetry::Trace.current_span.context.hex_span_id
-            trace_id = OpenTelemetry::Trace.current_span.context.hex_trace_id
-            if defined? OpenTelemetry::Trace.current_span.name
-              operation = OpenTelemetry::Trace.current_span.name
-            else
-              operation = 'undefined'
-            end
+        config = {
+          plugins: %I[ec2 ecs],
+          name: 'web_rubyrails'
+        }
 
-            { "time" => time, "level" => severity, "message" => msg, "trace_id" => trace_id, "span_id" => span_id,
-              "operation" => operation }.to_json + "\n"
-          end
+        XRay.recorder.configure(config)
+
+        Rails.logger.info("config: #{config}")
+
+        Rails.logger.formatter = proc do |severity, time, _progname, msg|
+            segment = XRay.recorder.current_segment
+            trace_id = segment ? segment.trace_id : 'undefined'
+
+            log_data = {
+              "segment" => segment,
+              "time" => time,
+              "level" => severity,
+              "message" => msg,
+              "trace_id" => trace_id
+            }
+
+            log_data.to_json + "\n"
+        end
     end
 end
 
 class ApplicationController < ActionController::API
-    
+
     before_action :no_cache
     
     # /
     def index
         render :plain => 'Hello from RoR!'
-
-        current_span = OpenTelemetry::Trace.current_span
-        current_span.add_attributes({
-            "my.cool.attribute" => "a value",
-            "my.first.name" => "Oscar"
-        })
 
         # log source IP 
         Rails.logger.info("/ Request from #{request.remote_ip}")
@@ -60,11 +69,6 @@ class ApplicationController < ActionController::API
             }
             if res.is_a?(Net::HTTPSuccess)
                 render :plain => elapsed.round.to_s, :status => 200
-
-                current_span = OpenTelemetry::Trace.current_span
-                current_span.add_attributes({
-                    "ellapsed time" => elapsed.round.to_s
-                })
             else
                 render :nothing => true, :status => 400
             end
@@ -117,5 +121,7 @@ class ApplicationController < ActionController::API
         response.headers["Cache-Control"] = 
             "no-store, no-cache, must-revalidate, max-age=0, pre-check=0, post-check=0"
     end
+
+    XRay.recorder.end_segment
 
 end
