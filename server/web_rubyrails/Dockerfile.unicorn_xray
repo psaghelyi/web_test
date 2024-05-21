@@ -1,0 +1,9 @@
+FROM rails_base_xray
+
+RUN gem install unicorn
+
+ADD unicorn.rb config/
+
+RUN mkdir -p shared/pids shared/log
+
+CMD ["unicorn", "-c", "config/unicorn.rb", "-E", "production"]

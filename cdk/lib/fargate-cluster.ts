@@ -5,8 +5,8 @@ import * as logs from 'aws-cdk-lib/aws-logs';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 
-import { createEchoService, createEchoOtelService } from './echo-service';
-import { createWebService, createOtelWebService } from './web-service';
+import { createEchoService, createEchoXrayService } from './echo-service';
+import { createWebService, createXrayWebService } from './web-service';
 
 export class FargateClusterStack extends cdk.Stack {
 
@@ -15,12 +15,12 @@ export class FargateClusterStack extends cdk.Stack {
 
     // Create a VPC for the Fargate cluster
     const vpc = new ec2.Vpc(this, 'WebtestVpc', {
-      maxAzs: 3 // Default is all AZs in region
+      maxAzs: 2 // Default is all AZs in region
     });
 
-    // Create a VPC for the OtelFargate cluster
-    const otelVpc = new ec2.Vpc(this, 'OtelWebtestVpc', {
-      maxAzs: 3 // Default is all AZs in region
+    // Create a VPC for the Fargate xray cluster
+    const xrayVpc = new ec2.Vpc(this, 'XrayWebtestVpc', {
+      maxAzs: 2 // Default is all AZs in region
     });
 
     // Create a new ECS cluster
@@ -30,8 +30,8 @@ export class FargateClusterStack extends cdk.Stack {
       defaultCloudMapNamespace: { name: 'local' }
     });
 
-    const otelCluster = new ecs.Cluster(this, 'WebtestOtelCluster', {
-      vpc: otelVpc,
+    const xrayCluster = new ecs.Cluster(this, 'WebtestClusterXray', {
+      vpc: xrayVpc,
       containerInsights: true,
       defaultCloudMapNamespace: { name: 'local' }
     });
@@ -44,11 +44,11 @@ export class FargateClusterStack extends cdk.Stack {
     });
 
     // Create log group with retention
-    const logGroupOtel = new logs.LogGroup(this, 'WebTestOtelLogGroup', {
-      logGroupName: '/ecs/web-test-otel',
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      retention: logs.RetentionDays.ONE_DAY,
-    });
+    // const logGroupXRay = new logs.LogGroup(this, 'WebTestXRayLogGroup', {
+    //   logGroupName: '/ecs/web-test-xray',
+    //   removalPolicy: cdk.RemovalPolicy.DESTROY,
+    //   retention: logs.RetentionDays.ONE_DAY,
+    // });
 
     const cwParam = new ssm.StringParameter(this, 'CloudWatchConfigStringParameter', {
       description: 'Parameter for CloudWatch agent',
@@ -88,9 +88,9 @@ export class FargateClusterStack extends cdk.Stack {
   
     // Create services
     const echoService = createEchoService(this, cluster, logGroup, cwParam);
-    const echoOtelService = createEchoOtelService(this, otelCluster, logGroupOtel, cwParam);
+    const echoXrayService = createEchoXrayService(this, xrayCluster, logGroup, cwParam);
     const webService = createWebService(this, cluster, logGroup, cwParam);
-    const webOtelService = createOtelWebService(this, otelCluster, logGroupOtel, cwParam);
+    const webXrayService = createXrayWebService(this, xrayCluster, logGroup, cwParam);
 
     //const influxdbService = createInfluxdbService(this, cluster, logGroup);
     //const locustService = createLocustService(this, cluster, logGroup);

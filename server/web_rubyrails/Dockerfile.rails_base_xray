@@ -1,0 +1,20 @@
+FROM ruby_base AS rails_base_xray
+
+RUN gem install rails -v "6.1.7"
+
+RUN rails new myapp -d sqlite3 --api
+
+WORKDIR /myapp
+
+RUN rake db:create
+
+RUN echo "gem 'aws-xray-sdk', require: ['aws-xray-sdk/facets/rails/railtie']" >> Gemfile
+RUN bundle install
+
+ADD application_controller_xray.rb app/controllers/application_controller.rb
+ADD routes.rb config/
+ADD aws_xray.rb config/initializers/
+
+EXPOSE 8080
+
+CMD ["rails", "server", "-b", "0.0.0.0", "-p", "8080"]

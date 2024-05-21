@@ -56,6 +56,8 @@ export class FargateWithOtelCollectorTaskDefinition
 
   // add CloudWatch side car container
   public addCloudWatchAgentContainer(logGroup: logs.LogGroup, swParam: ssm.StringParameter): ecs.ContainerDefinition {
+    const port = '2802'
+    const xrayDaemonAddress = `xray-daemon:${port}`
     const containerCloudWatch = this.addContainer('CloudWatchAgent', {
       image: ecs.ContainerImage.fromRegistry('amazon/cloudwatch-agent:latest'),
       logging: new ecs.AwsLogDriver({
@@ -63,6 +65,10 @@ export class FargateWithOtelCollectorTaskDefinition
         streamPrefix: 'cloudwatch',
         mode: ecs.AwsLogDriverMode.NON_BLOCKING }),
       essential: false,
+      environment: {
+        // 4
+        'AWS_XRAY_DAEMON_ADDRESS': xrayDaemonAddress,
+      },
       secrets: {
         "CW_CONFIG_CONTENT": ecs.Secret.fromSsmParameter(swParam),
       },
@@ -72,13 +78,22 @@ export class FargateWithOtelCollectorTaskDefinition
 
   // add XRay side car container
   public addXRaysidecarContainer(logGroup: logs.LogGroup): ecs.ContainerDefinition {
+    const port = '2802'
+    const bindAddress = `0.0.0.0:${port}`
+    const xrayDaemonAddress = `xray-daemon:${port}`
     const containerXRay = this.addContainer('XRay', {
       image: ecs.ContainerImage.fromRegistry('amazon/aws-xray-daemon:latest'),
+      containerName: 'xray-daemon',
       logging: new ecs.AwsLogDriver({
         logGroup: logGroup,
-        streamPrefix: 'xray',
+        streamPrefix: 'xray-daemon',
         mode: ecs.AwsLogDriverMode.NON_BLOCKING }),
       essential: false,
+      environment: {
+        AWS_XRAY_DAEMON_ADDRESS: xrayDaemonAddress,
+        AWS_XRAY_CONTEXT_MISSING: 'LOG_ERROR'
+      },
+      entryPoint: ["/xray", "-t", bindAddress, "-b", bindAddress],
     });
     return containerXRay;
   }

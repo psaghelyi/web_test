@@ -22,7 +22,7 @@ OpenTelemetry::SDK.configure do |c|
 
   # Alternatively, we could just enable all instrumentation:
   # c.use_all({ 'OpenTelemetry::Instrumentation::ActiveRecord' => { enabled: false } })
-  
+
 end
 
 # https://opentelemetry.io/docs/languages/ruby/instrumentation/

@@ -1,0 +1,7 @@
+FROM rails_base_xray
+
+RUN gem install puma
+
+ADD puma.rb config/
+
+CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]

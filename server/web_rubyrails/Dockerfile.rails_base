@@ -8,13 +8,13 @@ WORKDIR /myapp
 
 RUN rake db:create
 
-RUN echo "gem 'aws-xray-sdk', require: ['aws-xray-sdk/facets/rails/railtie']" >> Gemfile
-
+RUN bundle add opentelemetry-sdk opentelemetry-instrumentation-all opentelemetry-exporter-otlp opentelemetry-propagator-xray
 RUN bundle install
 
-ADD application_controller.rb app/controllers/
+ADD application_controller.rb app/controllers/application_controller.rb
+
 ADD routes.rb config/
-ADD aws_xray.rb config/initializers/
+ADD opentelemetry.rb config/initializers/
 
 EXPOSE 8080
 
