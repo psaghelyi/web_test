@@ -56,8 +56,8 @@ export class FargateWithOtelCollectorTaskDefinition
 
   // add CloudWatch side car container
   public addCloudWatchAgentContainer(logGroup: logs.LogGroup, swParam: ssm.StringParameter): ecs.ContainerDefinition {
-    const port = '2802'
-    const xrayDaemonAddress = `xray-daemon:${port}`
+    // const port = '2802'
+    // const xrayDaemonAddress = `xray-daemon:${port}`
     const containerCloudWatch = this.addContainer('CloudWatchAgent', {
       image: ecs.ContainerImage.fromRegistry('amazon/cloudwatch-agent:latest'),
       logging: new ecs.AwsLogDriver({
@@ -65,10 +65,10 @@ export class FargateWithOtelCollectorTaskDefinition
         streamPrefix: 'cloudwatch',
         mode: ecs.AwsLogDriverMode.NON_BLOCKING }),
       essential: false,
-      environment: {
-        // 4
-        'AWS_XRAY_DAEMON_ADDRESS': xrayDaemonAddress,
-      },
+      // environment: {
+      //   // 4
+      //   'AWS_XRAY_DAEMON_ADDRESS': xrayDaemonAddress,
+      // },
       secrets: {
         "CW_CONFIG_CONTENT": ecs.Secret.fromSsmParameter(swParam),
       },

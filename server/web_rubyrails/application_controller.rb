@@ -17,7 +17,7 @@ Rails.application.configure do
         end
 
         { "time" => time, "level" => severity, "message" => msg, "trace_id" => trace_id, "span_id" => span_id,
-          "operation" => operation }.to_json + "\n"
+          "operation" => operation }
       end
   end
 end

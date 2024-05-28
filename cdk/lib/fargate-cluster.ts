@@ -54,41 +54,42 @@ export class FargateClusterStack extends cdk.Stack {
       description: 'Parameter for CloudWatch agent',
       parameterName: 'CloudWatchConfig',
       stringValue: JSON.stringify(
-        {
-          "metrics": {
-            "namespace": "OpenTuna",
-            "metrics_collected": {
-              "cpu": {
-                "measurement": ["usage_idle", "usage_iowait", "usage_system", "usage_user"],
+          {
+            "metrics": {
+              "namespace": "WebTestCluster",
+              "metrics_collected": {
+                "cpu": {
+                  "measurement": ["usage_idle", "usage_iowait", "usage_system", "usage_user"],
+                },
+                "net": {
+                  "measurement": ["bytes_sent", "bytes_recv", "packets_sent", "packets_recv"],
+                },
+                "netstat": {
+                  "measurement": ["tcp_established", "tcp_syn_sent", "tcp_close"],
+                }
+              }
+            },
+            "logs": {
+              "metrics_collected": {
+                "emf": {}
               },
-              "net": {
-                "measurement": ["bytes_sent", "bytes_recv", "packets_sent", "packets_recv"],
-              },
-              "netstat": {
-                "measurement": ["tcp_established", "tcp_syn_sent", "tcp_close"],
+            },
+            "traces": {
+              "traces_collected": {
+                "xray": {
+                },
+                "otlp": {
+                }
               }
             }
-          },
-          "logs": {
-            "metrics_collected": {
-              "emf": {}
-            }
-          },
-          "traces": {
-            "traces_collected": {
-              "xray": {
-              },
-              "otlp": {
-              }
-            }
-          }              
-        }
+          }
       ),
     });
   
     // Create services
     const echoService = createEchoService(this, cluster, logGroup, cwParam);
     const echoXrayService = createEchoXrayService(this, xrayCluster, logGroup, cwParam);
+
     const webService = createWebService(this, cluster, logGroup, cwParam);
     const webXrayService = createXrayWebService(this, xrayCluster, logGroup, cwParam);
 

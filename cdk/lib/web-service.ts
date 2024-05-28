@@ -38,7 +38,6 @@ export function createXrayWebService(stack: cdk.Stack, cluster: ecs.Cluster, log
       mode: ecs.AwsLogDriverMode.NON_BLOCKING }),
     environment: {
       'WORKERS': '5',
-      'AWS_LOG_GROUP_NAMES': logGroup.logGroupName,
       'AWS_XRAY_CONTEXT_MISSING': 'LOG_ERROR',
     },
   });
@@ -49,7 +48,7 @@ export function createXrayWebService(stack: cdk.Stack, cluster: ecs.Cluster, log
 
   //const containerOtelCollector = webTaskDefinitionXray.addOtelCollectorContainer(logGroup);
   const containerCloudWatchAgent = webTaskDefinitionXray.addCloudWatchAgentContainer(logGroup, swParam);
-  const containerXRaysidecar = webTaskDefinitionXray.addXRaysidecarContainer(logGroup);
+  // const containerXRaysidecar = webTaskDefinitionXray.addXRaysidecarContainer(logGroup);
 
   // Rquests going through through ALB can get xray id in headers
   const webService = new ecs_patterns.ApplicationLoadBalancedFargateService(stack, 'WebServiceXray', {

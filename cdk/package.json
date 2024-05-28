@@ -19,6 +19,10 @@
     "typescript": "~5.0.4"
   },
   "dependencies": {
+    "@aws-cdk/aws-codebuild": "^1.204.0",
+    "@aws-cdk/aws-ecr": "^1.204.0",
+    "@aws-cdk/aws-events": "^1.204.0",
+    "@aws-cdk/aws-events-targets": "^1.204.0",
     "aws-cdk-lib": "^2.96.0",
     "constructs": "^10.1.279",
     "source-map-support": "^0.5.21"
