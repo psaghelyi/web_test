@@ -9,12 +9,15 @@ WORKDIR /myapp
 RUN rake db:create
 
 RUN echo "gem 'aws-xray-sdk', require: ['aws-xray-sdk/facets/rails/railtie']" >> Gemfile
+RUN bundle add aws-sdk-cloudwatchlogs
 RUN bundle install
 
 ADD application_controller_xray.rb app/controllers/application_controller.rb
 ADD routes.rb config/
 ADD aws_xray.rb config/initializers/
+ADD cw_logger.rb lib/
 
 EXPOSE 8080
+EXPOSE 2000
 
 CMD ["rails", "server", "-b", "0.0.0.0", "-p", "8080"]

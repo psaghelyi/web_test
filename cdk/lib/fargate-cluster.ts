@@ -77,8 +77,6 @@ export class FargateClusterStack extends cdk.Stack {
             "traces": {
               "traces_collected": {
                 "xray": {
-                },
-                "otlp": {
                 }
               }
             }
@@ -87,10 +85,10 @@ export class FargateClusterStack extends cdk.Stack {
     });
   
     // Create services
-    const echoService = createEchoService(this, cluster, logGroup, cwParam);
+    // const echoService = createEchoService(this, cluster, logGroup, cwParam);
     const echoXrayService = createEchoXrayService(this, xrayCluster, logGroup, cwParam);
 
-    const webService = createWebService(this, cluster, logGroup, cwParam);
+    // const webService = createWebService(this, cluster, logGroup, cwParam);
     const webXrayService = createXrayWebService(this, xrayCluster, logGroup, cwParam);
 
     //const influxdbService = createInfluxdbService(this, cluster, logGroup);
